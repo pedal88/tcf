@@ -80,37 +80,49 @@ def vendor_list():
             if 'vendorTypes' in custom_data:
                 vendor['vendorTypes'] = custom_data['vendorTypes']
         
-        # Add purposes data from GVL
-        if 'purposes' in vendor_info:
-            for purpose_id in vendor_info['purposes']:
-                if 1 <= purpose_id <= 10:
-                    vendor[f'p{purpose_id}'] = 1  # Consent
+        # Process purposes according to the new rules
+        flexible_purposes = vendor_info.get('flexiblePurposes', [])
+        leg_int_purposes = vendor_info.get('legIntPurposes', [])
+        purposes = vendor_info.get('purposes', [])
         
-        if 'legIntPurposes' in vendor_info:
-            for purpose_id in vendor_info['legIntPurposes']:
-                if 1 <= purpose_id <= 10:
-                    if vendor[f'p{purpose_id}'] == 1:
-                        vendor[f'p{purpose_id}'] = 3  # Both C and LI
-                    else:
-                        vendor[f'p{purpose_id}'] = 2  # LI only
+        # Process P1-P10 columns
+        for i in range(1, 11):
+            if i in flexible_purposes:
+                # Both C and LI for flexible purposes
+                vendor[f'p{i}'] = 3  # 3 represents both C and LI
+            elif i in leg_int_purposes:
+                # LI only
+                vendor[f'p{i}'] = 2  # 2 represents LI only
+            elif i in purposes:
+                # C only
+                vendor[f'p{i}'] = 1  # 1 represents C only
+            else:
+                # Neither
+                vendor[f'p{i}'] = 0  # 0 represents "-"
         
-        # Add special purposes
-        if 'specialPurposes' in vendor_info:
-            for sp_id in vendor_info['specialPurposes']:
-                if 1 <= sp_id <= 2:
-                    vendor[f'sp{sp_id}'] = 1
+        # Process special purposes (SP1, SP2)
+        special_purposes = vendor_info.get('specialPurposes', [])
+        for i in range(1, 3):
+            if i in special_purposes:
+                vendor[f'sp{i}'] = 1  # 1 represents "LI"
+            else:
+                vendor[f'sp{i}'] = 0  # 0 represents "-"
         
-        # Add features
-        if 'features' in vendor_info:
-            for f_id in vendor_info['features']:
-                if 1 <= f_id <= 3:
-                    vendor[f'f{f_id}'] = 1
+        # Process features (F1, F2, F3)
+        features = vendor_info.get('features', [])
+        for i in range(1, 4):
+            if i in features:
+                vendor[f'f{i}'] = 1  # 1 represents "LI"
+            else:
+                vendor[f'f{i}'] = 0  # 0 represents "-"
         
-        # Add special features
-        if 'specialFeatures' in vendor_info:
-            for sf_id in vendor_info['specialFeatures']:
-                if 1 <= sf_id <= 2:
-                    vendor[f'sf{sf_id}'] = 1
+        # Process special features (SF1, SF2)
+        special_features = vendor_info.get('specialFeatures', [])
+        for i in range(1, 3):
+            if i in special_features:
+                vendor[f'sf{i}'] = 1  # 1 represents "C"
+            else:
+                vendor[f'sf{i}'] = 0  # 0 represents "-"
         
         vendors.append(vendor)
     

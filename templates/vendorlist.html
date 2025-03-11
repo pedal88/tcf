@@ -526,11 +526,11 @@
         
         <!-- Vendor table -->
         <div class="table-responsive">
-            <table class="table table-hover" id="vendorTable">
+            <table id="vendorTable" class="table table-striped table-hover">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Vendor Name</th>
+                        <th>Vendor</th>
                         <th>Status</th>
                         <th>MBL Audited</th>
                         <th>Vendor Type</th>
@@ -557,7 +557,7 @@
                     {% for vendor in vendors %}
                     <tr>
                         <td>{{ vendor.id }}</td>
-                        <td class="text-truncate" title="{{ vendor.name }}">{{ vendor.name }}</td>
+                        <td title="{{ vendor.name }}">{{ vendor.name }}</td>
                         <td>
                             <select class="status-select {% if vendor.status == 'partner' %}status-partner{% elif vendor.status == 'shortlist' %}status-shortlist{% endif %}" data-vendor-id="{{ vendor.id }}" onchange="updateStatus(this)">
                                 <option value="" {% if vendor.status == "" %}selected{% endif %}>Select status</option>
