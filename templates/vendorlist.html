@@ -889,6 +889,17 @@
         
         // Initialize the filter on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // Fetch vendor list from IAB Europe TCF framework
+            fetch('https://vendor-list.consensu.org/v3/vendor-list.json')
+                .then(response => response.json())
+                .then(data => {
+                    // Process the vendor data
+                    processVendorData(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching vendor data:', error);
+                });
+            
             filterByStatus('all');
         });
         
