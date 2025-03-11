@@ -33,13 +33,15 @@
       "status": "partner",
       "vendorTypes": [
         "dsp"
-      ]
+      ],
+      "mblAudited": "Yes"
     },
     "253": {
       "status": "partner",
       "vendorTypes": [
         "ssp"
-      ]
+      ],
+      "mblAudited": "Yes"
     },
     "52": {
       "status": "partner",
@@ -57,7 +59,8 @@
       "status": "partner",
       "vendorTypes": [
         "ssp"
-      ]
+      ],
+      "mblAudited": "Yes"
     },
     "290": {
       "status": "partner",
@@ -88,7 +91,8 @@
       "vendorTypes": [
         "ssp",
         "dsp"
-      ]
+      ],
+      "mblAudited": "Yes"
     },
     "394": {
       "status": "partner",
@@ -118,7 +122,8 @@
       "status": "partner",
       "vendorTypes": [
         "measurement"
-      ]
+      ],
+      "mblAudited": "Yes"
     },
     "63": {
       "status": "partner",
@@ -130,7 +135,8 @@
       "status": "partner",
       "vendorTypes": [
         "ads"
-      ]
+      ],
+      "mblAudited": "Yes"
     },
     "466": {
       "status": "partner"

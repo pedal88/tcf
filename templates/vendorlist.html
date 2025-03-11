@@ -631,6 +631,287 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
+        // Store password in session storage when entered
+        let updatePassword = '';
+        
+        // Function to get password if needed
+        function getPasswordIfNeeded() {
+            if (!updatePassword) {
+                updatePassword = prompt("Enter update password:");
+                if (!updatePassword) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        // Function to update status
+        function updateStatus(select) {
+            if (!getPasswordIfNeeded()) return;
+            
+            var vendorId = select.getAttribute('data-vendor-id');
+            var status = select.value;
+            
+            // Update the select element class
+            select.className = 'status-select';
+            if (status === 'partner') {
+                select.classList.add('status-partner');
+            } else if (status === 'shortlist') {
+                select.classList.add('status-shortlist');
+            }
+            
+            // Send the update to the server
+            fetch('/update_vendor', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    vendorId: vendorId,
+                    field: 'status',
+                    value: status,
+                    password: updatePassword
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    console.error('Error updating status:', data.error);
+                    if (data.error === 'Invalid password') {
+                        updatePassword = ''; // Clear invalid password
+                        alert('Invalid password. Please try again.');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error updating status:', error);
+            });
+        }
+        
+        // Function to update MBL Audited status
+        function updateMBLAudited(checkbox) {
+            if (!getPasswordIfNeeded()) {
+                // Revert the checkbox if password not provided
+                checkbox.checked = !checkbox.checked;
+                return;
+            }
+            
+            var vendorId = checkbox.getAttribute('data-vendor-id');
+            var isChecked = checkbox.checked;
+            var value = isChecked ? "Yes" : "No/Unknown";
+            
+            // Update the label text
+            var label = document.querySelector('label[for="mbl-toggle-' + vendorId + '"]');
+            label.textContent = value;
+            
+            console.log("Updating MBL Audited for vendor " + vendorId + " to " + value);
+            
+            // Send the update to the server
+            fetch('/update_vendor', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    vendorId: vendorId,
+                    field: 'mblAudited',
+                    value: value,
+                    password: updatePassword
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Server response:", data);
+                if (!data.success) {
+                    console.error('Error updating MBL Audited status:', data.error);
+                    if (data.error === 'Invalid password') {
+                        updatePassword = ''; // Clear invalid password
+                        alert('Invalid password. Please try again.');
+                        // Revert the checkbox
+                        checkbox.checked = !checkbox.checked;
+                        label.textContent = checkbox.checked ? "Yes" : "No/Unknown";
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error updating MBL Audited status:', error);
+                // Revert the checkbox on error
+                checkbox.checked = !checkbox.checked;
+                label.textContent = checkbox.checked ? "Yes" : "No/Unknown";
+            });
+        }
+        
+        // Function to show vendor type dropdown
+        function showVendorTypeDropdown(vendorId, event) {
+            event.stopPropagation();
+            
+            // Close all other dropdowns first
+            document.querySelectorAll('.vendor-type-dropdown-content').forEach(function(dropdown) {
+                dropdown.style.display = 'none';
+            });
+            
+            // Show this dropdown
+            var dropdown = document.getElementById('vendor-type-dropdown-content-' + vendorId);
+            dropdown.style.display = 'block';
+            
+            // Add click event to close dropdown when clicking outside
+            setTimeout(function() {
+                document.addEventListener('click', function closeDropdown(e) {
+                    if (!dropdown.contains(e.target)) {
+                        dropdown.style.display = 'none';
+                        document.removeEventListener('click', closeDropdown);
+                    }
+                });
+            }, 0);
+        }
+        
+        // Function to add vendor type
+        function addVendorType(vendorId, type, event) {
+            if (!getPasswordIfNeeded()) return;
+            
+            event.stopPropagation();
+            
+            // Close the dropdown
+            var dropdown = document.getElementById('vendor-type-dropdown-content-' + vendorId);
+            dropdown.style.display = 'none';
+            
+            // Check if this type already exists
+            var container = document.getElementById('vendor-type-container-' + vendorId);
+            var existingTags = container.querySelectorAll('.vendor-type-tag');
+            for (var i = 0; i < existingTags.length; i++) {
+                if (existingTags[i].getAttribute('data-type') === type) {
+                    return; // Type already exists
+                }
+            }
+            
+            // Get current vendor types
+            var currentTypes = [];
+            existingTags.forEach(function(tag) {
+                currentTypes.push(tag.getAttribute('data-type'));
+            });
+            
+            // Add the new type
+            currentTypes.push(type);
+            
+            console.log("Updating vendor types for vendor " + vendorId + " to " + JSON.stringify(currentTypes));
+            
+            // Send the update to the server
+            fetch('/update_vendor', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    vendorId: vendorId,
+                    field: 'vendorTypes',
+                    value: currentTypes,
+                    password: updatePassword
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Server response:", data);
+                if (data.success) {
+                    // Add the tag to the UI
+                    var displayName;
+                    switch(type) {
+                        case 'ssp': displayName = 'SSP'; break;
+                        case 'dsp': displayName = 'DSP'; break;
+                        case 'ads': displayName = 'Ads'; break;
+                        case 'networks': displayName = 'Net'; break;
+                        case 'measurement': displayName = 'Meas'; break;
+                        case 'other': displayName = 'Other'; break;
+                        default: displayName = type;
+                    }
+                    
+                    var tag = document.createElement('span');
+                    tag.className = 'vendor-type-tag';
+                    tag.setAttribute('data-type', type);
+                    tag.innerHTML = displayName + '<span class="remove-type" onclick="removeVendorType(\'' + vendorId + '\', \'' + type + '\', event)">&times;</span>';
+                    container.appendChild(tag);
+                } else {
+                    console.error('Error adding vendor type:', data.error);
+                    if (data.error === 'Invalid password') {
+                        updatePassword = ''; // Clear invalid password
+                        alert('Invalid password. Please try again.');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error adding vendor type:', error);
+            });
+        }
+        
+        // Function to remove vendor type
+        function removeVendorType(vendorId, type, event) {
+            if (!getPasswordIfNeeded()) return;
+            
+            event.stopPropagation();
+            
+            // Get current vendor types
+            var container = document.getElementById('vendor-type-container-' + vendorId);
+            var existingTags = container.querySelectorAll('.vendor-type-tag');
+            var currentTypes = [];
+            
+            existingTags.forEach(function(tag) {
+                var tagType = tag.getAttribute('data-type');
+                if (tagType !== type) {
+                    currentTypes.push(tagType);
+                }
+            });
+            
+            console.log("Updating vendor types for vendor " + vendorId + " to " + JSON.stringify(currentTypes));
+            
+            // Send the update to the server
+            fetch('/update_vendor', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    vendorId: vendorId,
+                    field: 'vendorTypes',
+                    value: currentTypes,
+                    password: updatePassword
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Server response:", data);
+                if (data.success) {
+                    // Remove the tag from the UI
+                    var tagToRemove = null;
+                    existingTags.forEach(function(tag) {
+                        if (tag.getAttribute('data-type') === type) {
+                            tagToRemove = tag;
+                        }
+                    });
+                    
+                    if (tagToRemove) {
+                        container.removeChild(tagToRemove);
+                    }
+                } else {
+                    console.error('Error removing vendor type:', data.error);
+                    if (data.error === 'Invalid password') {
+                        updatePassword = ''; // Clear invalid password
+                        alert('Invalid password. Please try again.');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error removing vendor type:', error);
+            });
+        }
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.matches('.add-type-button') && !e.target.closest('.vendor-type-dropdown-content')) {
+                document.querySelectorAll('.vendor-type-dropdown-content').forEach(function(dropdown) {
+                    dropdown.style.display = 'none';
+                });
+            }
+        });
+        
         // JavaScript for filtering vendors
         function filterVendors() {
             // Get the search input value
@@ -670,270 +951,33 @@
             var tr = table.getElementsByTagName("tr");
             var visibleCount = 0;
             
-            // Loop through all table rows, and hide those that don't match the filters
-            for (var i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
-                var nameCell = tr[i].getElementsByTagName("td")[1]; // Vendor name column
-                var statusCell = tr[i].getElementsByTagName("td")[2]; // Status column
-                var statusSelect = statusCell.getElementsByTagName("select")[0];
-                var currentStatus = statusSelect.value;
+            // Loop through all table rows, and hide those who don't match the filters
+            for (var i = 1; i < tr.length; i++) { // Start from 1 to skip header row
+                var nameCell = tr[i].getElementsByTagName("td")[1];
+                var statusCell = tr[i].getElementsByTagName("td")[2];
                 
-                var showRow = true;
-                
-                // Check search filter
-                if (searchFilter) {
-                    var txtValue = nameCell.textContent || nameCell.innerText;
-                    if (txtValue.toUpperCase().indexOf(searchFilter) === -1) {
-                        showRow = false;
+                if (nameCell && statusCell) {
+                    var nameValue = nameCell.textContent || nameCell.innerText;
+                    var statusSelect = statusCell.getElementsByTagName("select")[0];
+                    var statusValue = statusSelect ? statusSelect.value : "";
+                    
+                    var matchesSearch = nameValue.toUpperCase().indexOf(searchFilter) > -1;
+                    var matchesStatus = statusFilter === 'all' || statusValue === statusFilter;
+                    
+                    if (matchesSearch && matchesStatus) {
+                        tr[i].style.display = "";
+                        visibleCount++;
+                    } else {
+                        tr[i].style.display = "none";
                     }
                 }
-                
-                // Check status filter
-                if (statusFilter !== 'all' && currentStatus !== statusFilter) {
-                    showRow = false;
-                }
-                
-                // Show or hide the row
-                if (showRow) {
-                    tr[i].style.display = "";
-                    visibleCount++;
-                } else {
-                    tr[i].style.display = "none";
-                }
             }
             
-            // Update the search count display
+            // Update the search count
             var searchCount = document.getElementById("searchCount");
-            if (searchFilter === "" && statusFilter === 'all') {
-                searchCount.textContent = "";
-            } else {
-                searchCount.textContent = "Showing " + visibleCount + " of ";
+            if (searchCount) {
+                searchCount.textContent = visibleCount + " vendors";
             }
-        }
-        
-        // Function to update vendor status
-        function updateStatus(selectElement) {
-            var vendorId = selectElement.getAttribute('data-vendor-id');
-            var status = selectElement.value;
-            
-            // Update the select element styling
-            if (status === 'partner') {
-                selectElement.classList.add('status-partner');
-                selectElement.classList.remove('status-shortlist');
-            } else if (status === 'shortlist') {
-                selectElement.classList.add('status-shortlist');
-                selectElement.classList.remove('status-partner');
-            } else {
-                selectElement.classList.remove('status-partner');
-                selectElement.classList.remove('status-shortlist');
-            }
-            
-            // Send the update to the server
-            fetch('/update_vendor', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    vendorId: vendorId,
-                    field: 'status',
-                    value: status
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    console.error('Error updating vendor status:', data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error updating vendor status:', error);
-            });
-            
-            // Re-apply filters to update the display
-            filterVendors();
-        }
-        
-        // Function to show vendor type dropdown
-        function showVendorTypeDropdown(vendorId, event) {
-            // Close all other dropdowns first
-            closeAllVendorTypeDropdowns();
-            
-            // Show the dropdown for this vendor
-            var dropdown = document.getElementById('vendor-type-dropdown-content-' + vendorId);
-            dropdown.style.display = 'block';
-            
-            // Stop event propagation
-            if (event) {
-                event.stopPropagation();
-            }
-        }
-        
-        // Function to close all vendor type dropdowns
-        function closeAllVendorTypeDropdowns() {
-            var dropdowns = document.getElementsByClassName('vendor-type-dropdown-content');
-            for (var i = 0; i < dropdowns.length; i++) {
-                dropdowns[i].style.display = 'none';
-            }
-        }
-        
-        // Function to add a vendor type
-        function addVendorType(vendorId, type, event) {
-            // Get the container
-            var container = document.getElementById('vendor-type-container-' + vendorId);
-            
-            // Check if this type already exists
-            var existingTags = container.getElementsByClassName('vendor-type-tag');
-            for (var i = 0; i < existingTags.length; i++) {
-                if (existingTags[i].getAttribute('data-type') === type) {
-                    closeAllVendorTypeDropdowns();
-                    return; // Type already exists, do nothing
-                }
-            }
-            
-            // Create a new tag
-            var tag = document.createElement('span');
-            tag.className = 'vendor-type-tag';
-            tag.setAttribute('data-type', type);
-            
-            // Set the display text based on the type
-            var displayText = '';
-            switch(type) {
-                case 'ssp': displayText = 'SSP'; break;
-                case 'dsp': displayText = 'DSP'; break;
-                case 'ads': displayText = 'Ads/Creatives'; break;
-                case 'networks': displayText = 'Networks'; break;
-                case 'measurement': displayText = 'Measurement'; break;
-                case 'other': displayText = 'Other'; break;
-                default: displayText = type;
-            }
-            
-            // Set the text content of the new tag
-            tag.innerHTML = displayText + '<span class="remove-type" onclick="removeVendorType(\'' + vendorId + '\', \'' + type + '\', event)">&times;</span>';
-            
-            // Add the new tag to the container
-            container.appendChild(tag);
-            
-            // Send the update to the server
-            updateVendorTypes(vendorId);
-            
-            // Close the dropdown
-            closeAllVendorTypeDropdowns();
-            
-            // Stop event propagation
-            if (event) {
-                event.stopPropagation();
-            }
-        }
-        
-        // Function to remove a vendor type
-        function removeVendorType(vendorId, type, event) {
-            // Get the container
-            var container = document.getElementById('vendor-type-container-' + vendorId);
-            
-            // Find and remove the tag
-            var tags = container.getElementsByClassName('vendor-type-tag');
-            for (var i = 0; i < tags.length; i++) {
-                if (tags[i].getAttribute('data-type') === type) {
-                    container.removeChild(tags[i]);
-                    break;
-                }
-            }
-            
-            // Send the update to the server
-            updateVendorTypes(vendorId);
-            
-            // Stop event propagation
-            if (event) {
-                event.stopPropagation();
-            }
-        }
-        
-        // Function to update vendor types on the server
-        function updateVendorTypes(vendorId) {
-            // Get all current types
-            var container = document.getElementById('vendor-type-container-' + vendorId);
-            var tags = container.getElementsByClassName('vendor-type-tag');
-            var types = [];
-            
-            for (var i = 0; i < tags.length; i++) {
-                types.push(tags[i].getAttribute('data-type'));
-            }
-            
-            // Send the update to the server
-            fetch('/update_vendor', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    vendorId: vendorId,
-                    field: 'vendorTypes',
-                    value: types
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    console.error('Error updating vendor types:', data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error updating vendor types:', error);
-            });
-        }
-        
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', function(event) {
-            closeAllVendorTypeDropdowns();
-        });
-        
-        // Initialize the filter on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Fetch vendor list from IAB Europe TCF framework
-            fetch('https://vendor-list.consensu.org/v3/vendor-list.json')
-                .then(response => response.json())
-                .then(data => {
-                    // Process the vendor data
-                    processVendorData(data);
-                })
-                .catch(error => {
-                    console.error('Error fetching vendor data:', error);
-                });
-            
-            filterByStatus('all');
-        });
-        
-        // Function to update MBL Audited status
-        function updateMBLAudited(checkbox) {
-            var vendorId = checkbox.getAttribute('data-vendor-id');
-            var isChecked = checkbox.checked;
-            var value = isChecked ? "Yes" : "No/Unknown";
-            
-            // Update the label text
-            var label = document.querySelector('label[for="mbl-toggle-' + vendorId + '"]');
-            label.textContent = value;
-            
-            // Send the update to the server
-            fetch('/update_vendor', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    vendorId: vendorId,
-                    field: 'mblAudited',
-                    value: value
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    console.error('Error updating MBL Audited status:', data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error updating MBL Audited status:', error);
-            });
         }
     </script>
 </body>

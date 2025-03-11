@@ -8,6 +8,10 @@ app = Flask(__name__)
 # Path to the vendor data JSON file
 VENDOR_DATA_FILE = os.path.join(os.path.dirname(__file__), 'vendor_data.json')
 
+# Get the update password from environment variable
+# If not set, updates will be disabled
+UPDATE_PASSWORD = os.environ.get('UPDATE_PASSWORD', None)
+
 # Function to load vendor data from JSON file
 def load_vendor_data():
     if os.path.exists(VENDOR_DATA_FILE):
@@ -16,6 +20,7 @@ def load_vendor_data():
                 return json.load(f)
         except Exception as e:
             print(f"Error loading vendor data: {e}")
+            return {"vendors": {}}
     return {"vendors": {}}
 
 # Function to save vendor data to JSON file
@@ -32,7 +37,7 @@ def save_vendor_data(data):
 def index():
     return render_template('index.html')
 
-@app.route('/vendors')
+@app.route('/vendorlist')
 def vendor_list():
     # Load the GVL data
     try:
@@ -40,7 +45,7 @@ def vendor_list():
             gvl_data = json.load(f)
     except:
         # If file doesn't exist, fetch it from the IAB
-        response = requests.get('https://vendor-list.consensu.org/v2/vendor-list.json')
+        response = requests.get('https://vendor-list.consensu.org/v3/vendor-list.json')
         gvl_data = response.json()
         with open('gvl.json', 'w') as f:
             json.dump(gvl_data, f)
@@ -112,7 +117,12 @@ def vendor_list():
     # Sort vendors by name
     vendors.sort(key=lambda x: x['name'].lower())
     
-    return render_template('vendorlist.html', vendors=vendors)
+    # Debug: Print the first few vendors to check if mblAudited is loaded correctly
+    for i in range(min(3, len(vendors))):
+        print(f"Vendor {vendors[i]['id']}: {vendors[i]['name']} - MBL Audited: {vendors[i]['mblAudited']}")
+        print(f"Vendor Types: {vendors[i]['vendorTypes']}")
+    
+    return render_template('vendorlist.html', vendors=vendors, update_enabled=UPDATE_PASSWORD is not None)
 
 @app.route('/update_vendor', methods=['POST'])
 def update_vendor():
@@ -121,6 +131,17 @@ def update_vendor():
         vendor_id = data.get('vendorId')
         field = data.get('field')
         value = data.get('value')
+        password = data.get('password')
+        
+        # Debug: Print the update request
+        print(f"Update request: Vendor {vendor_id}, Field {field}, Value {value}")
+        
+        # Check if updates are enabled and password matches
+        if not UPDATE_PASSWORD:
+            return jsonify({'success': False, 'error': 'Updates are disabled'})
+        
+        if password != UPDATE_PASSWORD:
+            return jsonify({'success': False, 'error': 'Invalid password'})
         
         if not vendor_id or not field:
             return jsonify({'success': False, 'error': 'Missing required fields'})
@@ -139,6 +160,9 @@ def update_vendor():
         # Update the field
         vendor_data['vendors'][vendor_id][field] = value
         
+        # Debug: Print the updated vendor data
+        print(f"Updated vendor data for {vendor_id}: {vendor_data['vendors'][vendor_id]}")
+        
         # Save the updated data
         if save_vendor_data(vendor_data):
             return jsonify({'success': True})
@@ -146,6 +170,7 @@ def update_vendor():
             return jsonify({'success': False, 'error': 'Failed to save vendor data'})
     
     except Exception as e:
+        print(f"Error in update_vendor: {str(e)}")
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/vendorlist')
