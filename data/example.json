@@ -1,0 +1,12 @@
+[
+    {
+        "name": "Vendor A",
+        "location": "Location A",
+        "contact": "123-456-7890"
+    },
+    {
+        "name": "Vendor B",
+        "location": "Location B",
+        "contact": "098-765-4321"
+    }
+] 

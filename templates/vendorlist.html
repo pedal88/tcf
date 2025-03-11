@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor List</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        /* Custom styling on top of Bootstrap */
+        body {
+            padding-top: 0;
+            background-color: #f8f9fa;
+            font-size: 0.875rem; /* Base font size reduction */
+        }
+        
+        .navbar {
+            margin-bottom: 20px;
+        }
+        
+        .table-responsive {
+            border-radius: 0.375rem;
+            overflow: hidden;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .table {
+            margin-bottom: 0;
+            table-layout: fixed;
+            font-size: 0.8rem; /* Reduced table font size */
+        }
+        
+        .table th {
+            background-color: #f8f9fa;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            font-weight: 600;
+            font-size: 0.75rem; /* Smaller header font */
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.5rem 0.25rem; /* Reduced padding */
+        }
+        
+        .table td {
+            padding: 0.4rem 0.25rem; /* Reduced cell padding */
+            vertical-align: middle;
+        }
+        
+        /* Column width adjustments */
+        .table th:nth-child(1), .table td:nth-child(1) { /* ID column */
+            width: 40px;
+        }
+        
+        .table th:nth-child(2), .table td:nth-child(2) { /* Vendor name column */
+            width: 160px;
+        }
+        
+        .table th:nth-child(3), .table td:nth-child(3) { /* Status column */
+            width: 100px;
+        }
+        
+        .table th:nth-child(4), .table td:nth-child(4) { /* MBL Audited column */
+            width: 100px;
+        }
+        
+        .table th:nth-child(5), .table td:nth-child(5) { /* Vendor Type column */
+            width: 220px;
+        }
+        
+        /* Purpose columns */
+        .table th:nth-child(n+6), .table td:nth-child(n+6) {
+            width: 40px;
+            text-align: center;
+        }
+        
+        /* Purpose value styling - updated with specified colors */
+        td.p-0, td.sp-0, td.f-0, td.sf-0 { 
+            background-color: #f8f9fa; 
+            color: #6c757d; 
+        } /* Light grey for "-" */
+        
+        td.p-1, td.sf-1 { 
+            background-color: #d1e7dd; 
+            color: #0f5132; 
+        } /* Light green for "C" */
+        
+        td.p-2, td.sp-1, td.f-1 { 
+            background-color: #cfe2ff; 
+            color: #084298; 
+        } /* Light blue for "LI" */
+        
+        td.p-3 { 
+            background-color: #fff3cd; 
+            color: #664d03; 
+        } /* Light yellow for "C, LI" */
+        
+        /* Vendor type styling - updated for compact display */
+        .vendor-type-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.2rem;
+            margin-bottom: 0.2rem;
+            min-height: 22px;
+        }
+        
+        .vendor-type-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.1rem 0.3rem;
+            background-color: #e9ecef;
+            border-radius: 0.2rem;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #495057;
+            white-space: nowrap;
+        }
+        
+        .remove-type {
+            margin-left: 0.2rem;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+            line-height: 1;
+        }
+        
+        .vendor-type-dropdown {
+            position: relative;
+        }
+        
+        .add-type-button {
+            padding: 0.1rem 0.3rem;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            border-radius: 0.2rem;
+            font-size: 0.65rem;
+            cursor: pointer;
+        }
+        
+        .vendor-type-dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            z-index: 20;
+            border-radius: 0.25rem;
+            padding: 0.5rem 0;
+            max-height: 200px;
+            overflow-y: auto;
+            left: 0;
+            top: 100%;
+        }
+        
+        .vendor-type-option {
+            padding: 0.4rem 0.75rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .vendor-type-option:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* MBL Audited toggle styling */
+        .mbl-toggle {
+            display: inline-block;
+            position: relative;
+            width: 100%;
+        }
+        
+        .mbl-toggle-input {
+            display: none;
+        }
+        
+        .mbl-toggle-label {
+            display: block;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            text-align: center;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            background-color: #f8f9fa;
+            color: #6c757d;
+            transition: all 0.2s ease;
+        }
+        
+        .mbl-toggle-input:checked + .mbl-toggle-label {
+            background-color: #d1e7dd;
+            color: #0f5132;
+            border-color: #a3cfbb;
+        }
+        
+        /* Status select styling */
+        .status-select {
+            width: 100%;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            background-color: #fff;
+        }
+        
+        .status-partner {
+            background-color: #d1e7dd;
+            color: #0f5132;
+            border-color: #a3cfbb;
+        }
+        
+        .status-shortlist {
+            background-color: #cfe2ff;
+            color: #084298;
+            border-color: #9ec5fe;
+        }
+        
+        /* Legend styling */
+        .legend {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 0.375rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .legend h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.875rem;
+        }
+        
+        .legend-color {
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-right: 0.5rem;
+            border-radius: 0.25rem;
+        }
+        
+        .legend-color.p-0 {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        
+        .legend-color.p-1 {
+            background-color: #d1e7dd;
+        }
+        
+        .legend-color.p-2 {
+            background-color: #cfe2ff;
+        }
+        
+        .legend-color.p-3 {
+            background-color: #fff3cd;
+        }
+        
+        /* Search and filter styling */
+        .search-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        
+        .search-input {
+            padding-left: 2.5rem;
+        }
+        
+        .search-count {
+            margin-left: 0.5rem;
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        
+        .filter-buttons {
+            margin-bottom: 1rem;
+        }
+        
+        .filter-btn {
+            margin-right: 0.5rem;
+            font-size: 0.875rem;
+            padding: 0.25rem 0.75rem;
+        }
+        
+        .filter-btn.active {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            color: white;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1400px) {
+            .table {
+                font-size: 0.75rem;
+            }
+            
+            .table th {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">TCF Vendor Manager</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/vendors">Vendor List</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <h1 class="mb-4">TCF Vendor List</h1>
+        
+        <!-- Purposes Accordion -->
+        <div class="accordion mb-4" id="purposesAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingPurposes">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePurposes" aria-expanded="true" aria-controls="collapsePurposes">
+                        TCF Purposes
+                    </button>
+                </h2>
+                <div id="collapsePurposes" class="accordion-collapse collapse show" aria-labelledby="headingPurposes" data-bs-parent="#purposesAccordion">
+                    <div class="accordion-body">
+                        <h3 class="mb-3">Standard Purposes</h3>
+                        <table class="table purposes-table">
+                            <tbody>
+                                <tr>
+                                    <td>P1</td>
+                                    <td>Store and/or access information on a device</td>
+                                    <td>Cookies, device identifiers, or other information can be stored or accessed on your device for the purposes presented to you.</td>
+                                    <td><span class="allowed-both">Consent or LI</span></td>
+                                </tr>
+                                <tr>
+                                    <td>P2</td>
+                                    <td>Select basic ads</td>
+                                    <td>Ads can be shown to you based on the content you're viewing, the app you're using, your approximate location, or your device type.</td>
+                                    <td><span class="allowed-both">Consent or LI</span></td>
+                                </tr>
+                                <tr>
+                                    <td>P3</td>
+                                    <td>Create a personalised ads profile</td>
+                                    <td>A profile can be built about you and your interests to show you personalised ads that are relevant to you.</td>
+                                    <td><span class="allowed-both">Consent or LI</span></td>
+                                </tr>
+                                <tr>
+                                    <td>P4</td>
+                                    <td>Select personalised ads</td>
+                                    <td>Personalised ads can be shown to you based on a profile about you.</td>
+                                    <td><span class="allowed-both">Consent or LI</span></td>
+                                </tr>
+                                <tr>
+                                    <td>P5</td>
+                                    <td>Create a personalised content profile</td>
+                                    <td>A profile can be built about you and your interests to show you personalised content that is relevant to you.</td>
+                                    <td><span class="allowed-both">Consent or LI</span></td>
+                                </tr>
+                                <tr>
+                                    <td>P6</td>
+                                    <td>Select personalised content</td>
+                                    <td>Personalised content can be shown to you based on a profile about you.</td>
+                                    <td><span class="allowed-both">Consent or LI</span></td>
+                                </tr>
+                                <tr>
+                                    <td>P7</td>
+                                    <td>Measure ad performance</td>
+                                    <td>The performance and effectiveness of ads that you see or interact with can be measured.</td>
+                                    <td><span class="allowed-both">Consent or LI</span></td>
+                                </tr>
+                                <tr>
+                                    <td>P8</td>
+                                    <td>Measure content performance</td>
+                                    <td>The performance and effectiveness of content that you see or interact with can be measured.</td>
+                                    <td><span class="allowed-both">Consent or LI</span></td>
+                                </tr>
+                                <tr>
+                                    <td>P9</td>
+                                    <td>Apply market research to generate audience insights</td>
+                                    <td>Market research can be used to learn more about the audiences who visit sites/apps and view ads.</td>
+                                    <td><span class="allowed-both">Consent or LI</span></td>
+                                </tr>
+                                <tr>
+                                    <td>P10</td>
+                                    <td>Develop and improve products</td>
+                                    <td>Your data can be used to improve existing systems and software, and to develop new products.</td>
+                                    <td><span class="allowed-both">Consent or LI</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <h3 class="mb-3 mt-4">Special Purposes</h3>
+                        <table class="table purposes-table">
+                            <tbody>
+                                <tr>
+                                    <td>SP1</td>
+                                    <td>Ensure security, prevent fraud, and debug</td>
+                                    <td>Your data can be used to monitor for and prevent fraudulent activity, and ensure systems and processes work properly and securely.</td>
+                                    <td><span class="allowed-li">LI Only</span></td>
+                                </tr>
+                                <tr>
+                                    <td>SP2</td>
+                                    <td>Technically deliver ads or content</td>
+                                    <td>Your device can receive and send information that allows you to see and interact with ads and content.</td>
+                                    <td><span class="allowed-li">LI Only</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <h3 class="mb-3 mt-4">Features</h3>
+                        <table class="table purposes-table">
+                            <tbody>
+                                <tr>
+                                    <td>F1</td>
+                                    <td>Match and combine offline data sources</td>
+                                    <td>Data from offline data sources can be combined with your online activity in support of one or more purposes.</td>
+                                    <td><span class="allowed-li">LI Only</span></td>
+                                </tr>
+                                <tr>
+                                    <td>F2</td>
+                                    <td>Link different devices</td>
+                                    <td>Different devices can be determined as belonging to you or your household in support of one or more purposes.</td>
+                                    <td><span class="allowed-li">LI Only</span></td>
+                                </tr>
+                                <tr>
+                                    <td>F3</td>
+                                    <td>Receive and use automatically-sent device characteristics for identification</td>
+                                    <td>Your device might be distinguished from other devices based on information it automatically sends, such as IP address or browser type.</td>
+                                    <td><span class="allowed-li">LI Only</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <h3 class="mb-3 mt-4">Special Features</h3>
+                        <table class="table purposes-table">
+                            <tbody>
+                                <tr>
+                                    <td>SF1</td>
+                                    <td>Use precise geolocation data</td>
+                                    <td>Your precise geolocation data can be used in support of one or more purposes.</td>
+                                    <td><span class="allowed-c">Consent Only</span></td>
+                                </tr>
+                                <tr>
+                                    <td>SF2</td>
+                                    <td>Actively scan device characteristics for identification</td>
+                                    <td>Your device can be identified based on a scan of your device's unique combination of characteristics.</td>
+                                    <td><span class="allowed-c">Consent Only</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Legend -->
+        <div class="legend">
+            <h3 class="fs-5">Legend</h3>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <div class="legend-color p-0"></div>
+                    <span>- (Not used)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color p-1"></div>
+                    <span>C (Consent)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color p-2"></div>
+                    <span>LI (Legitimate Interest)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color p-3"></div>
+                    <span>C, LI (Both)</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Search and filter -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="search-container">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" id="vendorSearch" class="form-control search-input" placeholder="Search vendors..." onkeyup="filterVendors()">
+                    <span id="searchCount" class="search-count"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="filter-buttons">
+                    <button id="filterAll" class="btn btn-outline-primary filter-btn active" onclick="filterByStatus('all')">All</button>
+                    <button id="filterPartner" class="btn btn-outline-primary filter-btn" onclick="filterByStatus('partner')">Partners</button>
+                    <button id="filterShortlist" class="btn btn-outline-primary filter-btn" onclick="filterByStatus('shortlist')">Shortlist</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Vendor table -->
+        <div class="table-responsive">
+            <table class="table table-hover" id="vendorTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Vendor Name</th>
+                        <th>Status</th>
+                        <th>MBL Audited</th>
+                        <th>Vendor Type</th>
+                        <th>P1</th>
+                        <th>P2</th>
+                        <th>P3</th>
+                        <th>P4</th>
+                        <th>P5</th>
+                        <th>P6</th>
+                        <th>P7</th>
+                        <th>P8</th>
+                        <th>P9</th>
+                        <th>P10</th>
+                        <th>SP1</th>
+                        <th>SP2</th>
+                        <th>F1</th>
+                        <th>F2</th>
+                        <th>F3</th>
+                        <th>SF1</th>
+                        <th>SF2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vendor in vendors %}
+                    <tr>
+                        <td>{{ vendor.id }}</td>
+                        <td class="text-truncate" title="{{ vendor.name }}">{{ vendor.name }}</td>
+                        <td>
+                            <select class="status-select {% if vendor.status == 'partner' %}status-partner{% elif vendor.status == 'shortlist' %}status-shortlist{% endif %}" data-vendor-id="{{ vendor.id }}" onchange="updateStatus(this)">
+                                <option value="" {% if vendor.status == "" %}selected{% endif %}>Select status</option>
+                                <option value="partner" {% if vendor.status == "partner" %}selected{% endif %}>Partner</option>
+                                <option value="shortlist" {% if vendor.status == "shortlist" %}selected{% endif %}>Shortlist</option>
+                            </select>
+                        </td>
+                        <td>
+                            <div class="mbl-toggle">
+                                <input type="checkbox" id="mbl-toggle-{{ vendor.id }}" class="mbl-toggle-input" data-vendor-id="{{ vendor.id }}" {% if vendor.mblAudited == "Yes" %}checked{% endif %} onchange="updateMBLAudited(this)">
+                                <label for="mbl-toggle-{{ vendor.id }}" class="mbl-toggle-label">
+                                    {% if vendor.mblAudited == "Yes" %}Yes{% else %}No/Unknown{% endif %}
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="vendor-type-container" id="vendor-type-container-{{ vendor.id }}">
+                                {% if vendor.vendorTypes %}
+                                    {% for type in vendor.vendorTypes %}
+                                    <span class="vendor-type-tag" data-type="{{ type }}">
+                                        {% if type == "ssp" %}SSP
+                                        {% elif type == "dsp" %}DSP
+                                        {% elif type == "ads" %}Ads
+                                        {% elif type == "networks" %}Net
+                                        {% elif type == "measurement" %}Meas
+                                        {% elif type == "other" %}Other
+                                        {% else %}{{ type }}
+                                        {% endif %}
+                                        <span class="remove-type" onclick="removeVendorType('{{ vendor.id }}', '{{ type }}', event)">&times;</span>
+                                    </span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="vendor-type-dropdown">
+                                <button class="add-type-button" onclick="showVendorTypeDropdown('{{ vendor.id }}', event)">+ Add</button>
+                                <div id="vendor-type-dropdown-content-{{ vendor.id }}" class="vendor-type-dropdown-content">
+                                    <div class="vendor-type-option" onclick="addVendorType('{{ vendor.id }}', 'ssp', event)">SSP</div>
+                                    <div class="vendor-type-option" onclick="addVendorType('{{ vendor.id }}', 'dsp', event)">DSP</div>
+                                    <div class="vendor-type-option" onclick="addVendorType('{{ vendor.id }}', 'ads', event)">Ads/Creatives</div>
+                                    <div class="vendor-type-option" onclick="addVendorType('{{ vendor.id }}', 'networks', event)">Networks</div>
+                                    <div class="vendor-type-option" onclick="addVendorType('{{ vendor.id }}', 'measurement', event)">Measurement</div>
+                                    <div class="vendor-type-option" onclick="addVendorType('{{ vendor.id }}', 'other', event)">Other</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-{{ vendor.p1 }}">{% if vendor.p1 == 0 %}-{% elif vendor.p1 == 1 %}C{% elif vendor.p1 == 2 %}LI{% elif vendor.p1 == 3 %}C, LI{% endif %}</td>
+                        <td class="p-{{ vendor.p2 }}">{% if vendor.p2 == 0 %}-{% elif vendor.p2 == 1 %}C{% elif vendor.p2 == 2 %}LI{% elif vendor.p2 == 3 %}C, LI{% endif %}</td>
+                        <td class="p-{{ vendor.p3 }}">{% if vendor.p3 == 0 %}-{% elif vendor.p3 == 1 %}C{% elif vendor.p3 == 2 %}LI{% elif vendor.p3 == 3 %}C, LI{% endif %}</td>
+                        <td class="p-{{ vendor.p4 }}">{% if vendor.p4 == 0 %}-{% elif vendor.p4 == 1 %}C{% elif vendor.p4 == 2 %}LI{% elif vendor.p4 == 3 %}C, LI{% endif %}</td>
+                        <td class="p-{{ vendor.p5 }}">{% if vendor.p5 == 0 %}-{% elif vendor.p5 == 1 %}C{% elif vendor.p5 == 2 %}LI{% elif vendor.p5 == 3 %}C, LI{% endif %}</td>
+                        <td class="p-{{ vendor.p6 }}">{% if vendor.p6 == 0 %}-{% elif vendor.p6 == 1 %}C{% elif vendor.p6 == 2 %}LI{% elif vendor.p6 == 3 %}C, LI{% endif %}</td>
+                        <td class="p-{{ vendor.p7 }}">{% if vendor.p7 == 0 %}-{% elif vendor.p7 == 1 %}C{% elif vendor.p7 == 2 %}LI{% elif vendor.p7 == 3 %}C, LI{% endif %}</td>
+                        <td class="p-{{ vendor.p8 }}">{% if vendor.p8 == 0 %}-{% elif vendor.p8 == 1 %}C{% elif vendor.p8 == 2 %}LI{% elif vendor.p8 == 3 %}C, LI{% endif %}</td>
+                        <td class="p-{{ vendor.p9 }}">{% if vendor.p9 == 0 %}-{% elif vendor.p9 == 1 %}C{% elif vendor.p9 == 2 %}LI{% elif vendor.p9 == 3 %}C, LI{% endif %}</td>
+                        <td class="p-{{ vendor.p10 }}">{% if vendor.p10 == 0 %}-{% elif vendor.p10 == 1 %}C{% elif vendor.p10 == 2 %}LI{% elif vendor.p10 == 3 %}C, LI{% endif %}</td>
+                        <td class="sp-{{ vendor.sp1 }}">{% if vendor.sp1 == 0 %}-{% elif vendor.sp1 == 1 %}LI{% endif %}</td>
+                        <td class="sp-{{ vendor.sp2 }}">{% if vendor.sp2 == 0 %}-{% elif vendor.sp2 == 1 %}LI{% endif %}</td>
+                        <td class="f-{{ vendor.f1 }}">{% if vendor.f1 == 0 %}-{% elif vendor.f1 == 1 %}LI{% endif %}</td>
+                        <td class="f-{{ vendor.f2 }}">{% if vendor.f2 == 0 %}-{% elif vendor.f2 == 1 %}LI{% endif %}</td>
+                        <td class="f-{{ vendor.f3 }}">{% if vendor.f3 == 0 %}-{% elif vendor.f3 == 1 %}LI{% endif %}</td>
+                        <td class="sf-{{ vendor.sf1 }}">{% if vendor.sf1 == 0 %}-{% elif vendor.sf1 == 1 %}C{% endif %}</td>
+                        <td class="sf-{{ vendor.sf2 }}">{% if vendor.sf2 == 0 %}-{% elif vendor.sf2 == 1 %}C{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // JavaScript for filtering vendors
+        function filterVendors() {
+            // Get the search input value
+            var input = document.getElementById("vendorSearch");
+            var filter = input.value.toUpperCase();
+            
+            // Apply both search and status filters
+            applyFilters(filter, currentStatusFilter);
+        }
+        
+        // Current active filter
+        var currentStatusFilter = 'all';
+        
+        // Function to filter vendors based on status
+        function filterByStatus(status) {
+            // Update the active filter button
+            document.getElementById("filterAll").classList.remove("active");
+            document.getElementById("filterPartner").classList.remove("active");
+            document.getElementById("filterShortlist").classList.remove("active");
+            
+            document.getElementById("filter" + status.charAt(0).toUpperCase() + status.slice(1)).classList.add("active");
+            
+            // Update current filter
+            currentStatusFilter = status;
+            
+            // Get the current search filter
+            var input = document.getElementById("vendorSearch");
+            var filter = input.value.toUpperCase();
+            
+            // Apply both filters
+            applyFilters(filter, status);
+        }
+        
+        // Function to apply both search and status filters
+        function applyFilters(searchFilter, statusFilter) {
+            var table = document.getElementById("vendorTable");
+            var tr = table.getElementsByTagName("tr");
+            var visibleCount = 0;
+            
+            // Loop through all table rows, and hide those that don't match the filters
+            for (var i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
+                var nameCell = tr[i].getElementsByTagName("td")[1]; // Vendor name column
+                var statusCell = tr[i].getElementsByTagName("td")[2]; // Status column
+                var statusSelect = statusCell.getElementsByTagName("select")[0];
+                var currentStatus = statusSelect.value;
+                
+                var showRow = true;
+                
+                // Check search filter
+                if (searchFilter) {
+                    var txtValue = nameCell.textContent || nameCell.innerText;
+                    if (txtValue.toUpperCase().indexOf(searchFilter) === -1) {
+                        showRow = false;
+                    }
+                }
+                
+                // Check status filter
+                if (statusFilter !== 'all' && currentStatus !== statusFilter) {
+                    showRow = false;
+                }
+                
+                // Show or hide the row
+                if (showRow) {
+                    tr[i].style.display = "";
+                    visibleCount++;
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+            
+            // Update the search count display
+            var searchCount = document.getElementById("searchCount");
+            if (searchFilter === "" && statusFilter === 'all') {
+                searchCount.textContent = "";
+            } else {
+                searchCount.textContent = "Showing " + visibleCount + " of ";
+            }
+        }
+        
+        // Function to update vendor status
+        function updateStatus(selectElement) {
+            var vendorId = selectElement.getAttribute('data-vendor-id');
+            var status = selectElement.value;
+            
+            // Update the select element styling
+            if (status === 'partner') {
+                selectElement.classList.add('status-partner');
+                selectElement.classList.remove('status-shortlist');
+            } else if (status === 'shortlist') {
+                selectElement.classList.add('status-shortlist');
+                selectElement.classList.remove('status-partner');
+            } else {
+                selectElement.classList.remove('status-partner');
+                selectElement.classList.remove('status-shortlist');
+            }
+            
+            // Send the update to the server
+            fetch('/update_vendor', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    vendorId: vendorId,
+                    field: 'status',
+                    value: status
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    console.error('Error updating vendor status:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating vendor status:', error);
+            });
+            
+            // Re-apply filters to update the display
+            filterVendors();
+        }
+        
+        // Function to show vendor type dropdown
+        function showVendorTypeDropdown(vendorId, event) {
+            // Close all other dropdowns first
+            closeAllVendorTypeDropdowns();
+            
+            // Show the dropdown for this vendor
+            var dropdown = document.getElementById('vendor-type-dropdown-content-' + vendorId);
+            dropdown.style.display = 'block';
+            
+            // Stop event propagation
+            if (event) {
+                event.stopPropagation();
+            }
+        }
+        
+        // Function to close all vendor type dropdowns
+        function closeAllVendorTypeDropdowns() {
+            var dropdowns = document.getElementsByClassName('vendor-type-dropdown-content');
+            for (var i = 0; i < dropdowns.length; i++) {
+                dropdowns[i].style.display = 'none';
+            }
+        }
+        
+        // Function to add a vendor type
+        function addVendorType(vendorId, type, event) {
+            // Get the container
+            var container = document.getElementById('vendor-type-container-' + vendorId);
+            
+            // Check if this type already exists
+            var existingTags = container.getElementsByClassName('vendor-type-tag');
+            for (var i = 0; i < existingTags.length; i++) {
+                if (existingTags[i].getAttribute('data-type') === type) {
+                    closeAllVendorTypeDropdowns();
+                    return; // Type already exists, do nothing
+                }
+            }
+            
+            // Create a new tag
+            var tag = document.createElement('span');
+            tag.className = 'vendor-type-tag';
+            tag.setAttribute('data-type', type);
+            
+            // Set the display text based on the type
+            var displayText = '';
+            switch(type) {
+                case 'ssp': displayText = 'SSP'; break;
+                case 'dsp': displayText = 'DSP'; break;
+                case 'ads': displayText = 'Ads/Creatives'; break;
+                case 'networks': displayText = 'Networks'; break;
+                case 'measurement': displayText = 'Measurement'; break;
+                case 'other': displayText = 'Other'; break;
+                default: displayText = type;
+            }
+            
+            // Set the text content of the new tag
+            tag.innerHTML = displayText + '<span class="remove-type" onclick="removeVendorType(\'' + vendorId + '\', \'' + type + '\', event)">&times;</span>';
+            
+            // Add the new tag to the container
+            container.appendChild(tag);
+            
+            // Send the update to the server
+            updateVendorTypes(vendorId);
+            
+            // Close the dropdown
+            closeAllVendorTypeDropdowns();
+            
+            // Stop event propagation
+            if (event) {
+                event.stopPropagation();
+            }
+        }
+        
+        // Function to remove a vendor type
+        function removeVendorType(vendorId, type, event) {
+            // Get the container
+            var container = document.getElementById('vendor-type-container-' + vendorId);
+            
+            // Find and remove the tag
+            var tags = container.getElementsByClassName('vendor-type-tag');
+            for (var i = 0; i < tags.length; i++) {
+                if (tags[i].getAttribute('data-type') === type) {
+                    container.removeChild(tags[i]);
+                    break;
+                }
+            }
+            
+            // Send the update to the server
+            updateVendorTypes(vendorId);
+            
+            // Stop event propagation
+            if (event) {
+                event.stopPropagation();
+            }
+        }
+        
+        // Function to update vendor types on the server
+        function updateVendorTypes(vendorId) {
+            // Get all current types
+            var container = document.getElementById('vendor-type-container-' + vendorId);
+            var tags = container.getElementsByClassName('vendor-type-tag');
+            var types = [];
+            
+            for (var i = 0; i < tags.length; i++) {
+                types.push(tags[i].getAttribute('data-type'));
+            }
+            
+            // Send the update to the server
+            fetch('/update_vendor', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    vendorId: vendorId,
+                    field: 'vendorTypes',
+                    value: types
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    console.error('Error updating vendor types:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating vendor types:', error);
+            });
+        }
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            closeAllVendorTypeDropdowns();
+        });
+        
+        // Initialize the filter on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            filterByStatus('all');
+        });
+        
+        // Function to update MBL Audited status
+        function updateMBLAudited(checkbox) {
+            var vendorId = checkbox.getAttribute('data-vendor-id');
+            var isChecked = checkbox.checked;
+            var value = isChecked ? "Yes" : "No/Unknown";
+            
+            // Update the label text
+            var label = document.querySelector('label[for="mbl-toggle-' + vendorId + '"]');
+            label.textContent = value;
+            
+            // Send the update to the server
+            fetch('/update_vendor', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    vendorId: vendorId,
+                    field: 'mblAudited',
+                    value: value
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    console.error('Error updating MBL Audited status:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating MBL Audited status:', error);
+            });
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,179 @@
+{
+  "vendors": {
+    "50": {
+      "status": "partner",
+      "vendorTypes": [
+        "ssp",
+        "dsp"
+      ],
+      "mblAudited": "Yes"
+    },
+    "755": {
+      "status": "partner",
+      "vendorTypes": [
+        "ssp",
+        "dsp"
+      ]
+    },
+    "855": {
+      "status": "partner",
+      "vendorTypes": [
+        "ssp",
+        "dsp"
+      ],
+      "mblAudited": "Yes"
+    },
+    "734": {
+      "status": "partner",
+      "vendorTypes": [
+        "measurement"
+      ]
+    },
+    "209": {
+      "status": "partner",
+      "vendorTypes": [
+        "dsp"
+      ]
+    },
+    "253": {
+      "status": "partner",
+      "vendorTypes": [
+        "ssp"
+      ]
+    },
+    "52": {
+      "status": "partner",
+      "vendorTypes": [
+        "ssp"
+      ]
+    },
+    "812": {
+      "status": "partner",
+      "vendorTypes": [
+        "measurement"
+      ]
+    },
+    "76": {
+      "status": "partner",
+      "vendorTypes": [
+        "ssp"
+      ]
+    },
+    "290": {
+      "status": "partner",
+      "vendorTypes": [
+        "networks"
+      ]
+    },
+    "659": {
+      "status": "partner",
+      "vendorTypes": [
+        "measurement"
+      ]
+    },
+    "111": {
+      "status": "partner",
+      "vendorTypes": [
+        "networks"
+      ]
+    },
+    "851": {
+      "status": "partner",
+      "vendorTypes": [
+        "networks"
+      ]
+    },
+    "32": {
+      "status": "partner",
+      "vendorTypes": [
+        "ssp",
+        "dsp"
+      ]
+    },
+    "394": {
+      "status": "partner",
+      "vendorTypes": [
+        "measurement"
+      ]
+    },
+    "613": {
+      "status": "partner",
+      "vendorTypes": [
+        "ads"
+      ]
+    },
+    "612": {
+      "status": "partner",
+      "vendorTypes": [
+        "ads"
+      ]
+    },
+    "126": {
+      "status": "partner",
+      "vendorTypes": [
+        "measurement"
+      ]
+    },
+    "278": {
+      "status": "partner",
+      "vendorTypes": [
+        "measurement"
+      ]
+    },
+    "63": {
+      "status": "partner",
+      "vendorTypes": [
+        "measurement"
+      ]
+    },
+    "486": {
+      "status": "partner",
+      "vendorTypes": [
+        "ads"
+      ]
+    },
+    "466": {
+      "status": "partner"
+    },
+    "729": {
+      "status": "partner",
+      "vendorTypes": [
+        "ads"
+      ]
+    },
+    "21": {
+      "status": "shortlist",
+      "vendorTypes": [
+        "dsp"
+      ]
+    },
+    "10": {
+      "status": "shortlist",
+      "vendorTypes": [
+        "ssp"
+      ]
+    },
+    "1247": {
+      "status": "shortlist",
+      "vendorTypes": [
+        "measurement"
+      ]
+    },
+    "358": {
+      "status": "shortlist",
+      "vendorTypes": [
+        "networks"
+      ]
+    },
+    "275": {
+      "status": "shortlist",
+      "vendorTypes": [
+        "dsp"
+      ]
+    },
+    "18": {
+      "vendorTypes": [],
+      "status": ""
+    }
+  }
+}
