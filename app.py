@@ -8,8 +8,11 @@ app = Flask(__name__)
 # Path to the vendor data JSON file
 VENDOR_DATA_FILE = os.path.join(os.path.dirname(__file__), 'vendor_data.json')
 
+# Set this to True to enable updates without password
+ENABLE_UPDATES_WITHOUT_PASSWORD = True
+
 # Get the update password from environment variable
-# If not set, updates will be disabled
+# If not set, updates will be disabled unless ENABLE_UPDATES_WITHOUT_PASSWORD is True
 UPDATE_PASSWORD = os.environ.get('UPDATE_PASSWORD', None)
 
 # Function to load vendor data from JSON file
@@ -33,12 +36,8 @@ def save_vendor_data(data):
         print(f"Error saving vendor data: {e}")
         return False
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/vendorlist')
-def vendor_list():
+# Function to ensure all vendors from GVL are in vendor_data.json with complete data structure
+def ensure_all_vendors_in_data():
     # Load the GVL data
     try:
         with open('gvl.json', 'r') as f:
@@ -50,18 +49,21 @@ def vendor_list():
         with open('gvl.json', 'w') as f:
             json.dump(gvl_data, f)
     
-    # Load custom vendor data
+    # Load current vendor data
     vendor_data = load_vendor_data()
     
-    # Process vendor data
-    vendors = []
+    # Ensure vendors dict exists
+    if 'vendors' not in vendor_data:
+        vendor_data['vendors'] = {}
+    
+    # Add entries for all vendors in GVL with complete data structure
+    updated = False
     for vendor_id, vendor_info in gvl_data['vendors'].items():
-        # Create a vendor object with default values
-        vendor = {
-            'id': vendor_id,
+        # Create default structure for this vendor
+        default_vendor_data = {
             'name': vendor_info['name'],
             'status': '',
-            'mblAudited': 'No/Unknown',  # Default value for MBL Audited
+            'mblAudited': 'No/Unknown',
             'vendorTypes': [],
             'p1': 0, 'p2': 0, 'p3': 0, 'p4': 0, 'p5': 0,
             'p6': 0, 'p7': 0, 'p8': 0, 'p9': 0, 'p10': 0,
@@ -70,71 +72,131 @@ def vendor_list():
             'sf1': 0, 'sf2': 0
         }
         
-        # Update with custom data if available
+        # Process purposes from GVL
+        if 'purposes' in vendor_info:
+            for purpose_id in vendor_info['purposes']:
+                if 1 <= int(purpose_id) <= 10:
+                    default_vendor_data[f'p{purpose_id}'] = 1
+        
+        # Process special purposes from GVL
+        if 'specialPurposes' in vendor_info:
+            for purpose_id in vendor_info['specialPurposes']:
+                if 1 <= int(purpose_id) <= 2:
+                    default_vendor_data[f'sp{purpose_id}'] = 1
+        
+        # Process features from GVL
+        if 'features' in vendor_info:
+            for feature_id in vendor_info['features']:
+                if 1 <= int(feature_id) <= 3:
+                    default_vendor_data[f'f{feature_id}'] = 1
+        
+        # Process special features from GVL
+        if 'specialFeatures' in vendor_info:
+            for feature_id in vendor_info['specialFeatures']:
+                if 1 <= int(feature_id) <= 2:
+                    default_vendor_data[f'sf{feature_id}'] = 1
+        
+        if vendor_id not in vendor_data['vendors']:
+            # If vendor doesn't exist in our data, add it with default values
+            vendor_data['vendors'][vendor_id] = default_vendor_data
+            updated = True
+        else:
+            # If vendor exists, ensure all fields are present
+            existing_vendor = vendor_data['vendors'][vendor_id]
+            
+            # Always update the name from GVL
+            if existing_vendor.get('name') != vendor_info['name']:
+                existing_vendor['name'] = vendor_info['name']
+                updated = True
+            
+            # Ensure all fields exist
+            for key, value in default_vendor_data.items():
+                if key not in existing_vendor:
+                    existing_vendor[key] = value
+                    updated = True
+    
+    # Save if changes were made
+    if updated:
+        save_vendor_data(vendor_data)
+    
+    return vendor_data
+
+# Function to process vendor data - shared between routes
+def process_vendor_data():
+    # Ensure all vendors are in vendor_data.json with complete data
+    vendor_data = ensure_all_vendors_in_data()
+    
+    # Load the GVL data
+    try:
+        with open('gvl.json', 'r') as f:
+            gvl_data = json.load(f)
+    except:
+        # If file doesn't exist, fetch it from the IAB
+        response = requests.get('https://vendor-list.consensu.org/v3/vendor-list.json')
+        gvl_data = response.json()
+        with open('gvl.json', 'w') as f:
+            json.dump(gvl_data, f)
+    
+    # Process vendor data
+    vendors = []
+    for vendor_id, vendor_info in gvl_data['vendors'].items():
         if vendor_id in vendor_data.get('vendors', {}):
+            # Get the stored vendor data
             custom_data = vendor_data['vendors'][vendor_id]
-            if 'status' in custom_data:
-                vendor['status'] = custom_data['status']
-            if 'mblAudited' in custom_data:
-                vendor['mblAudited'] = custom_data['mblAudited']
-            if 'vendorTypes' in custom_data:
-                vendor['vendorTypes'] = custom_data['vendorTypes']
-        
-        # Process purposes according to the new rules
-        flexible_purposes = vendor_info.get('flexiblePurposes', [])
-        leg_int_purposes = vendor_info.get('legIntPurposes', [])
-        purposes = vendor_info.get('purposes', [])
-        
-        # Process P1-P10 columns
-        for i in range(1, 11):
-            if i in flexible_purposes:
-                # Both C and LI for flexible purposes
-                vendor[f'p{i}'] = 3  # 3 represents both C and LI
-            elif i in leg_int_purposes:
-                # LI only
-                vendor[f'p{i}'] = 2  # 2 represents LI only
-            elif i in purposes:
-                # C only
-                vendor[f'p{i}'] = 1  # 1 represents C only
-            else:
-                # Neither
-                vendor[f'p{i}'] = 0  # 0 represents "-"
-        
-        # Process special purposes (SP1, SP2)
-        special_purposes = vendor_info.get('specialPurposes', [])
-        for i in range(1, 3):
-            if i in special_purposes:
-                vendor[f'sp{i}'] = 1  # 1 represents "LI"
-            else:
-                vendor[f'sp{i}'] = 0  # 0 represents "-"
-        
-        # Process features (F1, F2, F3)
-        features = vendor_info.get('features', [])
-        for i in range(1, 4):
-            if i in features:
-                vendor[f'f{i}'] = 1  # 1 represents "LI"
-            else:
-                vendor[f'f{i}'] = 0  # 0 represents "-"
-        
-        # Process special features (SF1, SF2)
-        special_features = vendor_info.get('specialFeatures', [])
-        for i in range(1, 3):
-            if i in special_features:
-                vendor[f'sf{i}'] = 1  # 1 represents "C"
-            else:
-                vendor[f'sf{i}'] = 0  # 0 represents "-"
-        
-        vendors.append(vendor)
+            
+            # Create a vendor object with data from vendor_data.json
+            vendor = {
+                'id': vendor_id,
+                'name': custom_data.get('name', vendor_info['name']),
+                'status': custom_data.get('status', ''),
+                'mblAudited': custom_data.get('mblAudited', 'No/Unknown'),
+                'vendorTypes': custom_data.get('vendorTypes', []),
+                'p1': custom_data.get('p1', 0), 
+                'p2': custom_data.get('p2', 0), 
+                'p3': custom_data.get('p3', 0), 
+                'p4': custom_data.get('p4', 0), 
+                'p5': custom_data.get('p5', 0),
+                'p6': custom_data.get('p6', 0), 
+                'p7': custom_data.get('p7', 0), 
+                'p8': custom_data.get('p8', 0), 
+                'p9': custom_data.get('p9', 0), 
+                'p10': custom_data.get('p10', 0),
+                'sp1': custom_data.get('sp1', 0), 
+                'sp2': custom_data.get('sp2', 0),
+                'f1': custom_data.get('f1', 0), 
+                'f2': custom_data.get('f2', 0), 
+                'f3': custom_data.get('f3', 0),
+                'sf1': custom_data.get('sf1', 0), 
+                'sf2': custom_data.get('sf2', 0)
+            }
+            
+            vendors.append(vendor)
     
-    # Sort vendors by name
-    vendors.sort(key=lambda x: x['name'].lower())
-    
-    # Debug: Print the first few vendors to check if mblAudited is loaded correctly
-    for i in range(min(3, len(vendors))):
-        print(f"Vendor {vendors[i]['id']}: {vendors[i]['name']} - MBL Audited: {vendors[i]['mblAudited']}")
-        print(f"Vendor Types: {vendors[i]['vendorTypes']}")
-    
-    return render_template('vendorlist.html', vendors=vendors, update_enabled=UPDATE_PASSWORD is not None)
+    return vendors
+
+@app.route('/')
+@app.route('/home')
+def index():
+    # Ensure all vendors are in vendor_data.json when app starts
+    ensure_all_vendors_in_data()
+    return render_template('index.html')
+
+@app.route('/vendor-management')
+def vendor_management():
+    # Use the same vendor data processing as vendorlist
+    vendors = process_vendor_data()
+    return render_template('vendor-management.html', vendors=vendors, update_enabled=True)
+
+@app.route('/purposeslist')
+def purposeslist():
+    # Use the same vendor data processing as vendorlist
+    vendors = process_vendor_data()
+    return render_template('purposeslist.html', vendors=vendors, update_enabled=True)
+
+@app.route('/vendorlist')
+def vendor_list():
+    vendors = process_vendor_data()
+    return render_template('vendorlist.html', vendors=vendors, update_enabled=True)
 
 @app.route('/update_vendor', methods=['POST'])
 def update_vendor():
@@ -148,11 +210,12 @@ def update_vendor():
         # Debug: Print the update request
         print(f"Update request: Vendor {vendor_id}, Field {field}, Value {value}")
         
-        # Check if updates are enabled and password matches
-        if not UPDATE_PASSWORD:
+        # Check if updates are enabled
+        if not UPDATE_PASSWORD and not ENABLE_UPDATES_WITHOUT_PASSWORD:
             return jsonify({'success': False, 'error': 'Updates are disabled'})
         
-        if password != UPDATE_PASSWORD:
+        # Check password if required
+        if UPDATE_PASSWORD and not ENABLE_UPDATES_WITHOUT_PASSWORD and password != UPDATE_PASSWORD:
             return jsonify({'success': False, 'error': 'Invalid password'})
         
         if not vendor_id or not field:
@@ -167,7 +230,20 @@ def update_vendor():
         
         # Initialize vendor entry if it doesn't exist
         if vendor_id not in vendor_data['vendors']:
-            vendor_data['vendors'][vendor_id] = {}
+            # Load the GVL data to get the vendor name
+            try:
+                with open('gvl.json', 'r') as f:
+                    gvl_data = json.load(f)
+                    vendor_name = gvl_data['vendors'][vendor_id]['name']
+            except:
+                vendor_name = f"Vendor {vendor_id}"
+            
+            vendor_data['vendors'][vendor_id] = {
+                'name': vendor_name,
+                'status': '',
+                'mblAudited': 'No/Unknown',
+                'vendorTypes': []
+            }
         
         # Update the field
         vendor_data['vendors'][vendor_id][field] = value
@@ -185,229 +261,7 @@ def update_vendor():
         print(f"Error in update_vendor: {str(e)}")
         return jsonify({'success': False, 'error': str(e)})
 
-@app.route('/vendorlist')
-def vendorlist():
-    try:
-        # Fetch the real vendor list from the IAB TCF API
-        response = requests.get('https://vendor-list.consensu.org/v2/vendor-list.json')
-        response.raise_for_status()  # Raise an exception for HTTP errors
-        
-        data = response.json()
-        
-        # Load saved vendor data
-        vendor_data = load_vendor_data()
-        
-        # Extract purposes data
-        purposes_data = []
-        for purpose_id, purpose_info in data.get('purposes', {}).items():
-            # Determine what the framework allows for this purpose
-            # This is example data - you would need to replace with actual framework rules
-            framework_allows = {
-                "1": {"C": True, "LI": False},  # Purpose 1: Only Consent
-                "2": {"C": True, "LI": True},   # Purpose 2: Both Consent and LI
-                "3": {"C": True, "LI": True},   # Purpose 3: Both Consent and LI
-                "4": {"C": True, "LI": True},   # Purpose 4: Both Consent and LI
-                "5": {"C": True, "LI": False},  # Purpose 5: Only Consent
-                "6": {"C": True, "LI": False},  # Purpose 6: Only Consent
-                "7": {"C": True, "LI": True},   # Purpose 7: Both Consent and LI
-                "8": {"C": True, "LI": False},  # Purpose 8: Only Consent
-                "9": {"C": True, "LI": True},   # Purpose 9: Both Consent and LI
-                "10": {"C": True, "LI": True},  # Purpose 10: Both Consent and LI
-            }
-            
-            purposes_data.append({
-                "id": purpose_id,
-                "name": purpose_info.get('name', ''),
-                "description": purpose_info.get('description', ''),
-                "consentAllowed": framework_allows.get(purpose_id, {}).get("C", False),
-                "legitimateInterestAllowed": framework_allows.get(purpose_id, {}).get("LI", False)
-            })
-        
-        # Extract vendors data
-        vendors_data = []
-        for vendor_id, vendor_info in data.get('vendors', {}).items():
-            # Get the vendor's purposes and legIntPurposes
-            purposes = [str(p) for p in vendor_info.get('purposes', [])]
-            leg_int_purposes = [str(p) for p in vendor_info.get('legIntPurposes', [])]
-            flexible_purposes = [str(p) for p in vendor_info.get('flexiblePurposes', [])]
-            special_purposes = [str(p) for p in vendor_info.get('specialPurposes', [])]
-            features = [str(f) for f in vendor_info.get('features', [])]
-            special_features = [str(f) for f in vendor_info.get('specialFeatures', [])]
-            
-            # Calculate purpose values
-            purpose_values = {}
-            for i in range(1, 11):
-                purpose_str = str(i)
-                
-                # Check if the purpose is in the vendor's purposes list
-                has_consent = purpose_str in purposes
-                
-                # Check if the purpose is in the vendor's legIntPurposes list
-                has_leg_int = purpose_str in leg_int_purposes
-                
-                # Check if the purpose is in the vendor's flexiblePurposes list
-                is_flexible = purpose_str in flexible_purposes
-                
-                # Determine the value based on the combination
-                if has_consent and has_leg_int:
-                    purpose_values[f"p{i}"] = 3  # Both Consent and LI
-                elif has_consent and is_flexible:
-                    purpose_values[f"p{i}"] = 3  # Both Consent and LI (flexible)
-                elif has_leg_int and is_flexible:
-                    purpose_values[f"p{i}"] = 3  # Both Consent and LI (flexible)
-                elif has_consent:
-                    purpose_values[f"p{i}"] = 1  # Consent only
-                elif has_leg_int:
-                    purpose_values[f"p{i}"] = 2  # LI only
-                else:
-                    purpose_values[f"p{i}"] = 0  # Not used
-            
-            # Calculate special purpose values
-            sp1_value = 1 if "1" in special_purposes else 0
-            sp2_value = 1 if "2" in special_purposes else 0
-            
-            # Calculate feature values
-            f1_value = 1 if "1" in features else 0
-            f2_value = 1 if "2" in features else 0
-            f3_value = 1 if "3" in features else 0
-            
-            # Calculate special feature values
-            sf1_value = 1 if "1" in special_features else 0
-            sf2_value = 1 if "2" in special_features else 0
-            
-            # Get saved vendor status and types
-            saved_vendor_data = vendor_data["vendors"].get(vendor_id, {})
-            status = saved_vendor_data.get("status", "")
-            vendor_types = saved_vendor_data.get("types", [])
-            
-            vendors_data.append({
-                "id": vendor_id,
-                "name": vendor_info.get('name', ''),
-                "purposes": purposes,
-                "legIntPurposes": leg_int_purposes,
-                "flexiblePurposes": flexible_purposes,
-                "specialPurposes": special_purposes,
-                "features": features,
-                "specialFeatures": special_features,
-                "p1": purpose_values.get("p1", 0),
-                "p2": purpose_values.get("p2", 0),
-                "p3": purpose_values.get("p3", 0),
-                "p4": purpose_values.get("p4", 0),
-                "p5": purpose_values.get("p5", 0),
-                "p6": purpose_values.get("p6", 0),
-                "p7": purpose_values.get("p7", 0),
-                "p8": purpose_values.get("p8", 0),
-                "p9": purpose_values.get("p9", 0),
-                "p10": purpose_values.get("p10", 0),
-                "sp1": sp1_value,
-                "sp2": sp2_value,
-                "f1": f1_value,
-                "f2": f2_value,
-                "f3": f3_value,
-                "sf1": sf1_value,
-                "sf2": sf2_value,
-                "status": status,
-                "vendorTypes": vendor_types
-            })
-        
-        # Sort vendors by ID
-        vendors_data.sort(key=lambda x: int(x['id']))
-        
-        return render_template('vendorlist.html', vendors=vendors_data, purposes=purposes_data)
-    
-    except requests.exceptions.RequestException as e:
-        # Handle request errors
-        error_message = f"Error fetching vendor list: {str(e)}"
-        return render_template('vendorlist.html', vendors=[], purposes=[], error=error_message)
-
-@app.route('/purposeslist')
-def purposeslist():
-    try:
-        # Fetch the vendor list from the IAB TCF API
-        response = requests.get('https://vendor-list.consensu.org/v2/vendor-list.json')
-        response.raise_for_status()
-        
-        data = response.json()
-        
-        # Extract purposes
-        purposes = []
-        for purpose_id, purpose_info in data.get('purposes', {}).items():
-            # Determine what the framework allows for this purpose
-            framework_allows = {
-                "1": {"C": True, "LI": False},  # Purpose 1: Only Consent
-                "2": {"C": True, "LI": True},   # Purpose 2: Both Consent and LI
-                "3": {"C": True, "LI": True},   # Purpose 3: Both Consent and LI
-                "4": {"C": True, "LI": True},   # Purpose 4: Both Consent and LI
-                "5": {"C": True, "LI": False},  # Purpose 5: Only Consent
-                "6": {"C": True, "LI": False},  # Purpose 6: Only Consent
-                "7": {"C": True, "LI": True},   # Purpose 7: Both Consent and LI
-                "8": {"C": True, "LI": False},  # Purpose 8: Only Consent
-                "9": {"C": True, "LI": True},   # Purpose 9: Both Consent and LI
-                "10": {"C": True, "LI": True},  # Purpose 10: Both Consent and LI
-            }
-            
-            purposes.append({
-                "id": purpose_id,
-                "name": purpose_info.get('name', ''),
-                "description": purpose_info.get('description', ''),
-                "consentAllowed": framework_allows.get(purpose_id, {}).get("C", False),
-                "legitimateInterestAllowed": framework_allows.get(purpose_id, {}).get("LI", False)
-            })
-        
-        # Sort purposes by ID
-        purposes.sort(key=lambda x: int(x['id']))
-        
-        # Extract special purposes
-        special_purposes = []
-        for purpose_id, purpose_info in data.get('specialPurposes', {}).items():
-            special_purposes.append({
-                "id": purpose_id,
-                "name": purpose_info.get('name', ''),
-                "description": purpose_info.get('description', '')
-            })
-        
-        # Sort special purposes by ID
-        special_purposes.sort(key=lambda x: int(x['id']))
-        
-        # Extract features
-        features = []
-        for feature_id, feature_info in data.get('features', {}).items():
-            features.append({
-                "id": feature_id,
-                "name": feature_info.get('name', ''),
-                "description": feature_info.get('description', '')
-            })
-        
-        # Sort features by ID
-        features.sort(key=lambda x: int(x['id']))
-        
-        # Extract special features
-        special_features = []
-        for feature_id, feature_info in data.get('specialFeatures', {}).items():
-            special_features.append({
-                "id": feature_id,
-                "name": feature_info.get('name', ''),
-                "description": feature_info.get('description', '')
-            })
-        
-        # Sort special features by ID
-        special_features.sort(key=lambda x: int(x['id']))
-        
-        return render_template('purposeslist.html', 
-                              purposes=purposes, 
-                              specialPurposes=special_purposes,
-                              features=features,
-                              specialFeatures=special_features)
-    
-    except requests.exceptions.RequestException as e:
-        # Handle request errors
-        error_message = f"Error fetching purposes list: {str(e)}"
-        return render_template('purposeslist.html', 
-                              purposes=[], 
-                              specialPurposes=[],
-                              features=[],
-                              specialFeatures=[],
-                              error=error_message)
-
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    # Ensure all vendors are in vendor_data.json when app starts
+    ensure_all_vendors_in_data()
+    app.run(debug=True)

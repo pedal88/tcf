@@ -39,290 +39,166 @@
             z-index: 10;
             font-weight: 600;
             font-size: 0.75rem; /* Smaller header font */
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 0.5rem 0.25rem; /* Reduced padding */
         }
         
-        .table td {
-            padding: 0.4rem 0.25rem; /* Reduced cell padding */
+        .table td, .table th {
+            padding: 0.25rem 0.4rem;
             vertical-align: middle;
         }
         
-        /* Column width adjustments */
-        .table th:nth-child(1), .table td:nth-child(1) { /* ID column */
+        /* Column widths */
+        .table th:nth-child(1), .table td:nth-child(1) { /* ID */
             width: 40px;
         }
         
-        .table th:nth-child(2), .table td:nth-child(2) { /* Vendor name column */
+        .table th:nth-child(2), .table td:nth-child(2) { /* Vendor */
             width: 160px;
         }
         
-        .table th:nth-child(3), .table td:nth-child(3) { /* Status column */
+        .table th:nth-child(3), .table td:nth-child(3) { /* Status */
             width: 100px;
         }
         
-        .table th:nth-child(4), .table td:nth-child(4) { /* MBL Audited column */
-            width: 100px;
-        }
-        
-        .table th:nth-child(5), .table td:nth-child(5) { /* Vendor Type column */
+        .table th:nth-child(4), .table td:nth-child(4) { /* Vendor Type */
             width: 220px;
         }
         
-        /* Purpose columns */
-        .table th:nth-child(n+6), .table td:nth-child(n+6) {
-            width: 40px;
-            text-align: center;
+        .table th:nth-child(5), .table td:nth-child(5) { /* MBL Audited */
+            width: 100px;
         }
         
-        /* Purpose value styling - updated with specified colors */
-        td.p-0, td.sp-0, td.f-0, td.sf-0 { 
-            background-color: #f8f9fa; 
-            color: #6c757d; 
-        } /* Light grey for "-" */
+        /* Vendor name truncation */
+        .table td:nth-child(2) {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
         
-        td.p-1, td.sf-1 { 
-            background-color: #d1e7dd; 
-            color: #0f5132; 
-        } /* Light green for "C" */
+        /* Status tag styling */
+        .status-tag {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 0.25rem;
+            padding: 0.125rem 0.375rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            width: fit-content;
+        }
         
-        td.p-2, td.sp-1, td.f-1 { 
-            background-color: #cfe2ff; 
-            color: #084298; 
-        } /* Light blue for "LI" */
+        .status-partner {
+            background-color: #d1e7dd;
+            border: 1px solid #badbcc;
+        }
         
-        td.p-3 { 
-            background-color: #fff3cd; 
-            color: #664d03; 
-        } /* Light yellow for "C, LI" */
+        .status-shortlist {
+            background-color: #fff3cd;
+            border: 1px solid #ffecb5;
+        }
         
-        /* Vendor type styling - updated for compact display */
+        .status-none {
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+        }
+        
+        /* MBL Audited styling */
+        .mbl-tag {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 0.25rem;
+            padding: 0.125rem 0.375rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            width: fit-content;
+        }
+        
+        .mbl-yes {
+            background-color: #d1e7dd;
+            border: 1px solid #badbcc;
+        }
+        
+        .mbl-no {
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+        }
+        
+        /* Vendor Type styling */
         .vendor-type-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.2rem;
-            margin-bottom: 0.2rem;
-            min-height: 22px;
+            gap: 0.25rem;
         }
         
         .vendor-type-tag {
             display: inline-flex;
             align-items: center;
-            padding: 0.1rem 0.3rem;
-            background-color: #e9ecef;
-            border-radius: 0.2rem;
-            font-size: 0.65rem;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            padding: 0.125rem 0.375rem;
+            font-size: 0.7rem;
             font-weight: 600;
-            color: #495057;
-            white-space: nowrap;
         }
         
-        .remove-type {
-            margin-left: 0.2rem;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.8rem;
-            line-height: 1;
-        }
-        
-        .vendor-type-dropdown {
-            position: relative;
-        }
-        
-        .add-type-button {
-            padding: 0.1rem 0.3rem;
-            background-color: #f8f9fa;
-            border: 1px solid #ced4da;
-            border-radius: 0.2rem;
-            font-size: 0.65rem;
-            cursor: pointer;
-        }
-        
-        .vendor-type-dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: white;
-            min-width: 160px;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            z-index: 20;
-            border-radius: 0.25rem;
-            padding: 0.5rem 0;
-            max-height: 200px;
-            overflow-y: auto;
-            left: 0;
-            top: 100%;
-        }
-        
-        .vendor-type-option {
-            padding: 0.4rem 0.75rem;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-        
-        .vendor-type-option:hover {
-            background-color: #f8f9fa;
-        }
-        
-        /* MBL Audited toggle styling */
-        .mbl-toggle {
-            display: inline-block;
-            position: relative;
-            width: 100%;
-        }
-        
-        .mbl-toggle-input {
-            display: none;
-        }
-        
-        .mbl-toggle-label {
-            display: block;
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
+        /* Purpose/Feature styling */
+        .purpose-cell {
             text-align: center;
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-            cursor: pointer;
-            background-color: #f8f9fa;
-            color: #6c757d;
-            transition: all 0.2s ease;
         }
         
-        .mbl-toggle-input:checked + .mbl-toggle-label {
-            background-color: #d1e7dd;
-            color: #0f5132;
-            border-color: #a3cfbb;
+        .purpose-yes {
+            color: #198754;
         }
         
-        /* Status select styling */
-        .status-select {
-            width: 100%;
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
+        .purpose-no {
+            color: #adb5bd;
+        }
+        
+        /* Filter controls */
+        .filter-controls {
             background-color: #fff;
-        }
-        
-        .status-partner {
-            background-color: #d1e7dd;
-            color: #0f5132;
-            border-color: #a3cfbb;
-        }
-        
-        .status-shortlist {
-            background-color: #cfe2ff;
-            color: #084298;
-            border-color: #9ec5fe;
-        }
-        
-        /* Legend styling */
-        .legend {
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            background-color: white;
             border-radius: 0.375rem;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
         }
         
-        .legend h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.75rem;
-        }
-        
-        .legend-items {
+        .filter-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
         }
         
-        .legend-item {
+        .filter-group {
             display: flex;
             align-items: center;
-            font-size: 0.875rem;
+            gap: 0.5rem;
         }
         
-        .legend-color {
-            width: 1.5rem;
-            height: 1.5rem;
-            margin-right: 0.5rem;
+        .filter-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+        
+        .filter-control {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
             border-radius: 0.25rem;
+            border: 1px solid #ced4da;
         }
         
-        .legend-color.p-0 {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-        }
-        
-        .legend-color.p-1 {
-            background-color: #d1e7dd;
-        }
-        
-        .legend-color.p-2 {
-            background-color: #cfe2ff;
-        }
-        
-        .legend-color.p-3 {
-            background-color: #fff3cd;
-        }
-        
-        /* Search and filter styling */
-        .search-container {
-            position: relative;
-            margin-bottom: 1rem;
-        }
-        
-        .search-icon {
-            position: absolute;
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
+        .results-count {
+            font-size: 0.8rem;
             color: #6c757d;
-        }
-        
-        .search-input {
-            padding-left: 2.5rem;
-        }
-        
-        .search-count {
-            margin-left: 0.5rem;
-            font-size: 0.875rem;
-            color: #6c757d;
-        }
-        
-        .filter-buttons {
-            margin-bottom: 1rem;
-        }
-        
-        .filter-btn {
-            margin-right: 0.5rem;
-            font-size: 0.875rem;
-            padding: 0.25rem 0.75rem;
-        }
-        
-        .filter-btn.active {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
-            color: white;
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 1400px) {
-            .table {
-                font-size: 0.75rem;
-            }
-            
-            .table th {
-                font-size: 0.7rem;
-            }
         }
     </style>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="/">TCF Vendor Manager</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">TCF Vendor Explorer</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -332,208 +208,116 @@
                         <a class="nav-link" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/vendors">Vendor List</a>
+                        <a class="nav-link active" href="/vendorlist">Vendor List</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/purposeslist">Purposes List</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/vendor-management">Vendor Management</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
-
-    <!-- Main Content -->
-    <div class="container mt-4">
-        <h1 class="mb-4">TCF Vendor List</h1>
-        
-        <!-- Purposes Accordion -->
-        <div class="accordion mb-4" id="purposesAccordion">
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingPurposes">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePurposes" aria-expanded="true" aria-controls="collapsePurposes">
-                        TCF Purposes
-                    </button>
-                </h2>
-                <div id="collapsePurposes" class="accordion-collapse collapse show" aria-labelledby="headingPurposes" data-bs-parent="#purposesAccordion">
-                    <div class="accordion-body">
-                        <h3 class="mb-3">Standard Purposes</h3>
-                        <table class="table purposes-table">
-                            <tbody>
-                                <tr>
-                                    <td>P1</td>
-                                    <td>Store and/or access information on a device</td>
-                                    <td>Cookies, device identifiers, or other information can be stored or accessed on your device for the purposes presented to you.</td>
-                                    <td><span class="allowed-both">Consent or LI</span></td>
-                                </tr>
-                                <tr>
-                                    <td>P2</td>
-                                    <td>Select basic ads</td>
-                                    <td>Ads can be shown to you based on the content you're viewing, the app you're using, your approximate location, or your device type.</td>
-                                    <td><span class="allowed-both">Consent or LI</span></td>
-                                </tr>
-                                <tr>
-                                    <td>P3</td>
-                                    <td>Create a personalised ads profile</td>
-                                    <td>A profile can be built about you and your interests to show you personalised ads that are relevant to you.</td>
-                                    <td><span class="allowed-both">Consent or LI</span></td>
-                                </tr>
-                                <tr>
-                                    <td>P4</td>
-                                    <td>Select personalised ads</td>
-                                    <td>Personalised ads can be shown to you based on a profile about you.</td>
-                                    <td><span class="allowed-both">Consent or LI</span></td>
-                                </tr>
-                                <tr>
-                                    <td>P5</td>
-                                    <td>Create a personalised content profile</td>
-                                    <td>A profile can be built about you and your interests to show you personalised content that is relevant to you.</td>
-                                    <td><span class="allowed-both">Consent or LI</span></td>
-                                </tr>
-                                <tr>
-                                    <td>P6</td>
-                                    <td>Select personalised content</td>
-                                    <td>Personalised content can be shown to you based on a profile about you.</td>
-                                    <td><span class="allowed-both">Consent or LI</span></td>
-                                </tr>
-                                <tr>
-                                    <td>P7</td>
-                                    <td>Measure ad performance</td>
-                                    <td>The performance and effectiveness of ads that you see or interact with can be measured.</td>
-                                    <td><span class="allowed-both">Consent or LI</span></td>
-                                </tr>
-                                <tr>
-                                    <td>P8</td>
-                                    <td>Measure content performance</td>
-                                    <td>The performance and effectiveness of content that you see or interact with can be measured.</td>
-                                    <td><span class="allowed-both">Consent or LI</span></td>
-                                </tr>
-                                <tr>
-                                    <td>P9</td>
-                                    <td>Apply market research to generate audience insights</td>
-                                    <td>Market research can be used to learn more about the audiences who visit sites/apps and view ads.</td>
-                                    <td><span class="allowed-both">Consent or LI</span></td>
-                                </tr>
-                                <tr>
-                                    <td>P10</td>
-                                    <td>Develop and improve products</td>
-                                    <td>Your data can be used to improve existing systems and software, and to develop new products.</td>
-                                    <td><span class="allowed-both">Consent or LI</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        
-                        <h3 class="mb-3 mt-4">Special Purposes</h3>
-                        <table class="table purposes-table">
-                            <tbody>
-                                <tr>
-                                    <td>SP1</td>
-                                    <td>Ensure security, prevent fraud, and debug</td>
-                                    <td>Your data can be used to monitor for and prevent fraudulent activity, and ensure systems and processes work properly and securely.</td>
-                                    <td><span class="allowed-li">LI Only</span></td>
-                                </tr>
-                                <tr>
-                                    <td>SP2</td>
-                                    <td>Technically deliver ads or content</td>
-                                    <td>Your device can receive and send information that allows you to see and interact with ads and content.</td>
-                                    <td><span class="allowed-li">LI Only</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        
-                        <h3 class="mb-3 mt-4">Features</h3>
-                        <table class="table purposes-table">
-                            <tbody>
-                                <tr>
-                                    <td>F1</td>
-                                    <td>Match and combine offline data sources</td>
-                                    <td>Data from offline data sources can be combined with your online activity in support of one or more purposes.</td>
-                                    <td><span class="allowed-li">LI Only</span></td>
-                                </tr>
-                                <tr>
-                                    <td>F2</td>
-                                    <td>Link different devices</td>
-                                    <td>Different devices can be determined as belonging to you or your household in support of one or more purposes.</td>
-                                    <td><span class="allowed-li">LI Only</span></td>
-                                </tr>
-                                <tr>
-                                    <td>F3</td>
-                                    <td>Receive and use automatically-sent device characteristics for identification</td>
-                                    <td>Your device might be distinguished from other devices based on information it automatically sends, such as IP address or browser type.</td>
-                                    <td><span class="allowed-li">LI Only</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        
-                        <h3 class="mb-3 mt-4">Special Features</h3>
-                        <table class="table purposes-table">
-                            <tbody>
-                                <tr>
-                                    <td>SF1</td>
-                                    <td>Use precise geolocation data</td>
-                                    <td>Your precise geolocation data can be used in support of one or more purposes.</td>
-                                    <td><span class="allowed-c">Consent Only</span></td>
-                                </tr>
-                                <tr>
-                                    <td>SF2</td>
-                                    <td>Actively scan device characteristics for identification</td>
-                                    <td>Your device can be identified based on a scan of your device's unique combination of characteristics.</td>
-                                    <td><span class="allowed-c">Consent Only</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+    
+    <div class="container-fluid">
+        <!-- Filter Controls -->
+        <div class="filter-controls">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="searchInput" class="filter-label">Search:</label>
+                    <input type="text" id="searchInput" class="filter-control" placeholder="Vendor name..." onkeyup="filterTable()">
                 </div>
+                <div class="filter-group">
+                    <label for="statusFilter" class="filter-label">Status:</label>
+                    <select id="statusFilter" class="filter-control" onchange="filterTable()">
+                        <option value="all">All</option>
+                        <option value="Partner">Partner</option>
+                        <option value="Shortlist">Shortlist</option>
+                        <option value="none">None</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="typeFilter" class="filter-label">Vendor Type:</label>
+                    <select id="typeFilter" class="filter-control" onchange="filterTable()">
+                        <option value="all">All</option>
+                        <option value="ssp">SSP</option>
+                        <option value="dsp">DSP</option>
+                        <option value="ads">Ads</option>
+                        <option value="networks">Networks</option>
+                        <option value="measurement">Measurement</option>
+                        <option value="other">Other</option>
+                        <option value="none">None</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="mblFilter" class="filter-label">MBL Audited:</label>
+                    <select id="mblFilter" class="filter-control" onchange="filterTable()">
+                        <option value="all">All</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No/Unknown">No/Unknown</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="purposeFilter" class="filter-label">Purpose:</label>
+                    <select id="purposeFilter" class="filter-control" onchange="filterTable()">
+                        <option value="all">All</option>
+                        <option value="p1">P1: Store and/or access information on a device</option>
+                        <option value="p2">P2: Select basic ads</option>
+                        <option value="p3">P3: Create a personalised ads profile</option>
+                        <option value="p4">P4: Select personalised ads</option>
+                        <option value="p5">P5: Create a personalised content profile</option>
+                        <option value="p6">P6: Select personalised content</option>
+                        <option value="p7">P7: Measure ad performance</option>
+                        <option value="p8">P8: Measure content performance</option>
+                        <option value="p9">P9: Apply market research</option>
+                        <option value="p10">P10: Develop and improve products</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="specialPurposeFilter" class="filter-label">Special Purpose:</label>
+                    <select id="specialPurposeFilter" class="filter-control" onchange="filterTable()">
+                        <option value="all">All</option>
+                        <option value="sp1">SP1: Ensure security, prevent fraud, and debug</option>
+                        <option value="sp2">SP2: Technically deliver ads or content</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="featureFilter" class="filter-label">Feature:</label>
+                    <select id="featureFilter" class="filter-control" onchange="filterTable()">
+                        <option value="all">All</option>
+                        <option value="f1">F1: Match and combine offline data sources</option>
+                        <option value="f2">F2: Link different devices</option>
+                        <option value="f3">F3: Receive and use automatically-sent device characteristics</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="specialFeatureFilter" class="filter-label">Special Feature:</label>
+                    <select id="specialFeatureFilter" class="filter-control" onchange="filterTable()">
+                        <option value="all">All</option>
+                        <option value="sf1">SF1: Use precise geolocation data</option>
+                        <option value="sf2">SF2: Actively scan device characteristics</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-row">
+                <span id="resultsCount" class="results-count">Showing all vendors</span>
             </div>
         </div>
         
-        <!-- Legend -->
-        <div class="legend">
-            <h3 class="fs-5">Legend</h3>
-            <div class="legend-items">
-                <div class="legend-item">
-                    <div class="legend-color p-0"></div>
-                    <span>- (Not used)</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color p-1"></div>
-                    <span>C (Consent)</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color p-2"></div>
-                    <span>LI (Legitimate Interest)</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color p-3"></div>
-                    <span>C, LI (Both)</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Search and filter -->
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <div class="search-container">
-                    <i class="bi bi-search search-icon"></i>
-                    <input type="text" id="vendorSearch" class="form-control search-input" placeholder="Search vendors..." onkeyup="filterVendors()">
-                    <span id="searchCount" class="search-count"></span>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="filter-buttons">
-                    <button id="filterAll" class="btn btn-outline-primary filter-btn active" onclick="filterByStatus('all')">All</button>
-                    <button id="filterPartner" class="btn btn-outline-primary filter-btn" onclick="filterByStatus('partner')">Partners</button>
-                    <button id="filterShortlist" class="btn btn-outline-primary filter-btn" onclick="filterByStatus('shortlist')">Shortlist</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Vendor table -->
+        <!-- Vendor Table -->
         <div class="table-responsive">
-            <table id="vendorTable" class="table table-striped table-hover">
+            <table id="vendorTable" class="table table-striped table-bordered">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Vendor</th>
                         <th>Status</th>
-                        <th>MBL Audited</th>
                         <th>Vendor Type</th>
+                        <th>MBL Audited</th>
                         <th>P1</th>
                         <th>P2</th>
                         <th>P3</th>
@@ -559,67 +343,90 @@
                         <td>{{ vendor.id }}</td>
                         <td title="{{ vendor.name }}">{{ vendor.name }}</td>
                         <td>
-                            <select class="status-select {% if vendor.status == 'partner' %}status-partner{% elif vendor.status == 'shortlist' %}status-shortlist{% endif %}" data-vendor-id="{{ vendor.id }}" onchange="updateStatus(this)">
-                                <option value="" {% if vendor.status == "" %}selected{% endif %}>Select status</option>
-                                <option value="partner" {% if vendor.status == "partner" %}selected{% endif %}>Partner</option>
-                                <option value="shortlist" {% if vendor.status == "shortlist" %}selected{% endif %}>Shortlist</option>
-                            </select>
+                            {% if vendor.status %}
+                                <span class="status-tag {% if vendor.status == 'Partner' %}status-partner{% elif vendor.status == 'Shortlist' %}status-shortlist{% else %}status-none{% endif %}">
+                                    {{ vendor.status }}
+                                </span>
+                            {% else %}
+                                <span class="status-tag status-none">None</span>
+                            {% endif %}
                         </td>
                         <td>
-                            <div class="mbl-toggle">
-                                <input type="checkbox" id="mbl-toggle-{{ vendor.id }}" class="mbl-toggle-input" data-vendor-id="{{ vendor.id }}" {% if vendor.mblAudited == "Yes" %}checked{% endif %} onchange="updateMBLAudited(this)">
-                                <label for="mbl-toggle-{{ vendor.id }}" class="mbl-toggle-label">
-                                    {% if vendor.mblAudited == "Yes" %}Yes{% else %}No/Unknown{% endif %}
-                                </label>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="vendor-type-container" id="vendor-type-container-{{ vendor.id }}">
+                            <div class="vendor-type-container">
                                 {% if vendor.vendorTypes %}
                                     {% for type in vendor.vendorTypes %}
-                                    <span class="vendor-type-tag" data-type="{{ type }}">
-                                        {% if type == "ssp" %}SSP
-                                        {% elif type == "dsp" %}DSP
-                                        {% elif type == "ads" %}Ads
-                                        {% elif type == "networks" %}Net
-                                        {% elif type == "measurement" %}Meas
-                                        {% elif type == "other" %}Other
-                                        {% else %}{{ type }}
-                                        {% endif %}
-                                        <span class="remove-type" onclick="removeVendorType('{{ vendor.id }}', '{{ type }}', event)">&times;</span>
-                                    </span>
+                                        <span class="vendor-type-tag" data-type="{{ type }}">
+                                            {% if type == 'ssp' %}SSP
+                                            {% elif type == 'dsp' %}DSP
+                                            {% elif type == 'ads' %}Ads
+                                            {% elif type == 'networks' %}Net
+                                            {% elif type == 'measurement' %}Meas
+                                            {% elif type == 'other' %}Other
+                                            {% else %}{{ type }}
+                                            {% endif %}
+                                        </span>
                                     {% endfor %}
                                 {% endif %}
                             </div>
-                            <div class="vendor-type-dropdown">
-                                <button class="add-type-button" onclick="showVendorTypeDropdown('{{ vendor.id }}', event)">+ Add</button>
-                                <div id="vendor-type-dropdown-content-{{ vendor.id }}" class="vendor-type-dropdown-content">
-                                    <div class="vendor-type-option" onclick="addVendorType('{{ vendor.id }}', 'ssp', event)">SSP</div>
-                                    <div class="vendor-type-option" onclick="addVendorType('{{ vendor.id }}', 'dsp', event)">DSP</div>
-                                    <div class="vendor-type-option" onclick="addVendorType('{{ vendor.id }}', 'ads', event)">Ads/Creatives</div>
-                                    <div class="vendor-type-option" onclick="addVendorType('{{ vendor.id }}', 'networks', event)">Networks</div>
-                                    <div class="vendor-type-option" onclick="addVendorType('{{ vendor.id }}', 'measurement', event)">Measurement</div>
-                                    <div class="vendor-type-option" onclick="addVendorType('{{ vendor.id }}', 'other', event)">Other</div>
-                                </div>
-                            </div>
                         </td>
-                        <td class="p-{{ vendor.p1 }}">{% if vendor.p1 == 0 %}-{% elif vendor.p1 == 1 %}C{% elif vendor.p1 == 2 %}LI{% elif vendor.p1 == 3 %}C, LI{% endif %}</td>
-                        <td class="p-{{ vendor.p2 }}">{% if vendor.p2 == 0 %}-{% elif vendor.p2 == 1 %}C{% elif vendor.p2 == 2 %}LI{% elif vendor.p2 == 3 %}C, LI{% endif %}</td>
-                        <td class="p-{{ vendor.p3 }}">{% if vendor.p3 == 0 %}-{% elif vendor.p3 == 1 %}C{% elif vendor.p3 == 2 %}LI{% elif vendor.p3 == 3 %}C, LI{% endif %}</td>
-                        <td class="p-{{ vendor.p4 }}">{% if vendor.p4 == 0 %}-{% elif vendor.p4 == 1 %}C{% elif vendor.p4 == 2 %}LI{% elif vendor.p4 == 3 %}C, LI{% endif %}</td>
-                        <td class="p-{{ vendor.p5 }}">{% if vendor.p5 == 0 %}-{% elif vendor.p5 == 1 %}C{% elif vendor.p5 == 2 %}LI{% elif vendor.p5 == 3 %}C, LI{% endif %}</td>
-                        <td class="p-{{ vendor.p6 }}">{% if vendor.p6 == 0 %}-{% elif vendor.p6 == 1 %}C{% elif vendor.p6 == 2 %}LI{% elif vendor.p6 == 3 %}C, LI{% endif %}</td>
-                        <td class="p-{{ vendor.p7 }}">{% if vendor.p7 == 0 %}-{% elif vendor.p7 == 1 %}C{% elif vendor.p7 == 2 %}LI{% elif vendor.p7 == 3 %}C, LI{% endif %}</td>
-                        <td class="p-{{ vendor.p8 }}">{% if vendor.p8 == 0 %}-{% elif vendor.p8 == 1 %}C{% elif vendor.p8 == 2 %}LI{% elif vendor.p8 == 3 %}C, LI{% endif %}</td>
-                        <td class="p-{{ vendor.p9 }}">{% if vendor.p9 == 0 %}-{% elif vendor.p9 == 1 %}C{% elif vendor.p9 == 2 %}LI{% elif vendor.p9 == 3 %}C, LI{% endif %}</td>
-                        <td class="p-{{ vendor.p10 }}">{% if vendor.p10 == 0 %}-{% elif vendor.p10 == 1 %}C{% elif vendor.p10 == 2 %}LI{% elif vendor.p10 == 3 %}C, LI{% endif %}</td>
-                        <td class="sp-{{ vendor.sp1 }}">{% if vendor.sp1 == 0 %}-{% elif vendor.sp1 == 1 %}LI{% endif %}</td>
-                        <td class="sp-{{ vendor.sp2 }}">{% if vendor.sp2 == 0 %}-{% elif vendor.sp2 == 1 %}LI{% endif %}</td>
-                        <td class="f-{{ vendor.f1 }}">{% if vendor.f1 == 0 %}-{% elif vendor.f1 == 1 %}LI{% endif %}</td>
-                        <td class="f-{{ vendor.f2 }}">{% if vendor.f2 == 0 %}-{% elif vendor.f2 == 1 %}LI{% endif %}</td>
-                        <td class="f-{{ vendor.f3 }}">{% if vendor.f3 == 0 %}-{% elif vendor.f3 == 1 %}LI{% endif %}</td>
-                        <td class="sf-{{ vendor.sf1 }}">{% if vendor.sf1 == 0 %}-{% elif vendor.sf1 == 1 %}C{% endif %}</td>
-                        <td class="sf-{{ vendor.sf2 }}">{% if vendor.sf2 == 0 %}-{% elif vendor.sf2 == 1 %}C{% endif %}</td>
+                        <td>
+                            {% if vendor.mblAudited == 'Yes' %}
+                                <span class="mbl-tag mbl-yes">Yes</span>
+                            {% else %}
+                                <span class="mbl-tag mbl-no">No/Unknown</span>
+                            {% endif %}
+                        </td>
+                        <td class="purpose-cell">
+                            <i class="bi {% if vendor.p1 %}bi-check-circle-fill purpose-yes{% else %}bi-x-circle purpose-no{% endif %}"></i>
+                        </td>
+                        <td class="purpose-cell">
+                            <i class="bi {% if vendor.p2 %}bi-check-circle-fill purpose-yes{% else %}bi-x-circle purpose-no{% endif %}"></i>
+                        </td>
+                        <td class="purpose-cell">
+                            <i class="bi {% if vendor.p3 %}bi-check-circle-fill purpose-yes{% else %}bi-x-circle purpose-no{% endif %}"></i>
+                        </td>
+                        <td class="purpose-cell">
+                            <i class="bi {% if vendor.p4 %}bi-check-circle-fill purpose-yes{% else %}bi-x-circle purpose-no{% endif %}"></i>
+                        </td>
+                        <td class="purpose-cell">
+                            <i class="bi {% if vendor.p5 %}bi-check-circle-fill purpose-yes{% else %}bi-x-circle purpose-no{% endif %}"></i>
+                        </td>
+                        <td class="purpose-cell">
+                            <i class="bi {% if vendor.p6 %}bi-check-circle-fill purpose-yes{% else %}bi-x-circle purpose-no{% endif %}"></i>
+                        </td>
+                        <td class="purpose-cell">
+                            <i class="bi {% if vendor.p7 %}bi-check-circle-fill purpose-yes{% else %}bi-x-circle purpose-no{% endif %}"></i>
+                        </td>
+                        <td class="purpose-cell">
+                            <i class="bi {% if vendor.p8 %}bi-check-circle-fill purpose-yes{% else %}bi-x-circle purpose-no{% endif %}"></i>
+                        </td>
+                        <td class="purpose-cell">
+                            <i class="bi {% if vendor.p9 %}bi-check-circle-fill purpose-yes{% else %}bi-x-circle purpose-no{% endif %}"></i>
+                        </td>
+                        <td class="purpose-cell">
+                            <i class="bi {% if vendor.p10 %}bi-check-circle-fill purpose-yes{% else %}bi-x-circle purpose-no{% endif %}"></i>
+                        </td>
+                        <td class="purpose-cell">
+                            <i class="bi {% if vendor.sp1 %}bi-check-circle-fill purpose-yes{% else %}bi-x-circle purpose-no{% endif %}"></i>
+                        </td>
+                        <td class="purpose-cell">
+                            <i class="bi {% if vendor.sp2 %}bi-check-circle-fill purpose-yes{% else %}bi-x-circle purpose-no{% endif %}"></i>
+                        </td>
+                        <td class="purpose-cell">
+                            <i class="bi {% if vendor.f1 %}bi-check-circle-fill purpose-yes{% else %}bi-x-circle purpose-no{% endif %}"></i>
+                        </td>
+                        <td class="purpose-cell">
+                            <i class="bi {% if vendor.f2 %}bi-check-circle-fill purpose-yes{% else %}bi-x-circle purpose-no{% endif %}"></i>
+                        </td>
+                        <td class="purpose-cell">
+                            <i class="bi {% if vendor.f3 %}bi-check-circle-fill purpose-yes{% else %}bi-x-circle purpose-no{% endif %}"></i>
+                        </td>
+                        <td class="purpose-cell">
+                            <i class="bi {% if vendor.sf1 %}bi-check-circle-fill purpose-yes{% else %}bi-x-circle purpose-no{% endif %}"></i>
+                        </td>
+                        <td class="purpose-cell">
+                            <i class="bi {% if vendor.sf2 %}bi-check-circle-fill purpose-yes{% else %}bi-x-circle purpose-no{% endif %}"></i>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -627,344 +434,91 @@
         </div>
     </div>
     
-    <!-- Bootstrap JS Bundle with Popper -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Store password in session storage when entered
-        let updatePassword = '';
-        
-        // Function to get password if needed
-        function getPasswordIfNeeded() {
-            if (!updatePassword) {
-                updatePassword = prompt("Enter update password:");
-                if (!updatePassword) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        
-        // Function to update status
-        function updateStatus(select) {
-            if (!getPasswordIfNeeded()) return;
+        // Function to filter the table
+        function filterTable() {
+            var searchInput = document.getElementById("searchInput");
+            var searchFilter = searchInput.value.toUpperCase();
+            var statusFilter = document.getElementById("statusFilter").value;
+            var typeFilter = document.getElementById("typeFilter").value;
+            var mblFilter = document.getElementById("mblFilter").value;
+            var purposeFilter = document.getElementById("purposeFilter").value;
+            var specialPurposeFilter = document.getElementById("specialPurposeFilter").value;
+            var featureFilter = document.getElementById("featureFilter").value;
+            var specialFeatureFilter = document.getElementById("specialFeatureFilter").value;
             
-            var vendorId = select.getAttribute('data-vendor-id');
-            var status = select.value;
-            
-            // Update the select element class
-            select.className = 'status-select';
-            if (status === 'partner') {
-                select.classList.add('status-partner');
-            } else if (status === 'shortlist') {
-                select.classList.add('status-shortlist');
-            }
-            
-            // Send the update to the server
-            fetch('/update_vendor', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    vendorId: vendorId,
-                    field: 'status',
-                    value: status,
-                    password: updatePassword
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    console.error('Error updating status:', data.error);
-                    if (data.error === 'Invalid password') {
-                        updatePassword = ''; // Clear invalid password
-                        alert('Invalid password. Please try again.');
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error updating status:', error);
-            });
-        }
-        
-        // Function to update MBL Audited status
-        function updateMBLAudited(checkbox) {
-            if (!getPasswordIfNeeded()) {
-                // Revert the checkbox if password not provided
-                checkbox.checked = !checkbox.checked;
-                return;
-            }
-            
-            var vendorId = checkbox.getAttribute('data-vendor-id');
-            var isChecked = checkbox.checked;
-            var value = isChecked ? "Yes" : "No/Unknown";
-            
-            // Update the label text
-            var label = document.querySelector('label[for="mbl-toggle-' + vendorId + '"]');
-            label.textContent = value;
-            
-            console.log("Updating MBL Audited for vendor " + vendorId + " to " + value);
-            
-            // Send the update to the server
-            fetch('/update_vendor', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    vendorId: vendorId,
-                    field: 'mblAudited',
-                    value: value,
-                    password: updatePassword
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Server response:", data);
-                if (!data.success) {
-                    console.error('Error updating MBL Audited status:', data.error);
-                    if (data.error === 'Invalid password') {
-                        updatePassword = ''; // Clear invalid password
-                        alert('Invalid password. Please try again.');
-                        // Revert the checkbox
-                        checkbox.checked = !checkbox.checked;
-                        label.textContent = checkbox.checked ? "Yes" : "No/Unknown";
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error updating MBL Audited status:', error);
-                // Revert the checkbox on error
-                checkbox.checked = !checkbox.checked;
-                label.textContent = checkbox.checked ? "Yes" : "No/Unknown";
-            });
-        }
-        
-        // Function to show vendor type dropdown
-        function showVendorTypeDropdown(vendorId, event) {
-            event.stopPropagation();
-            
-            // Close all other dropdowns first
-            document.querySelectorAll('.vendor-type-dropdown-content').forEach(function(dropdown) {
-                dropdown.style.display = 'none';
-            });
-            
-            // Show this dropdown
-            var dropdown = document.getElementById('vendor-type-dropdown-content-' + vendorId);
-            dropdown.style.display = 'block';
-            
-            // Add click event to close dropdown when clicking outside
-            setTimeout(function() {
-                document.addEventListener('click', function closeDropdown(e) {
-                    if (!dropdown.contains(e.target)) {
-                        dropdown.style.display = 'none';
-                        document.removeEventListener('click', closeDropdown);
-                    }
-                });
-            }, 0);
-        }
-        
-        // Function to add vendor type
-        function addVendorType(vendorId, type, event) {
-            if (!getPasswordIfNeeded()) return;
-            
-            event.stopPropagation();
-            
-            // Close the dropdown
-            var dropdown = document.getElementById('vendor-type-dropdown-content-' + vendorId);
-            dropdown.style.display = 'none';
-            
-            // Check if this type already exists
-            var container = document.getElementById('vendor-type-container-' + vendorId);
-            var existingTags = container.querySelectorAll('.vendor-type-tag');
-            for (var i = 0; i < existingTags.length; i++) {
-                if (existingTags[i].getAttribute('data-type') === type) {
-                    return; // Type already exists
-                }
-            }
-            
-            // Get current vendor types
-            var currentTypes = [];
-            existingTags.forEach(function(tag) {
-                currentTypes.push(tag.getAttribute('data-type'));
-            });
-            
-            // Add the new type
-            currentTypes.push(type);
-            
-            console.log("Updating vendor types for vendor " + vendorId + " to " + JSON.stringify(currentTypes));
-            
-            // Send the update to the server
-            fetch('/update_vendor', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    vendorId: vendorId,
-                    field: 'vendorTypes',
-                    value: currentTypes,
-                    password: updatePassword
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Server response:", data);
-                if (data.success) {
-                    // Add the tag to the UI
-                    var displayName;
-                    switch(type) {
-                        case 'ssp': displayName = 'SSP'; break;
-                        case 'dsp': displayName = 'DSP'; break;
-                        case 'ads': displayName = 'Ads'; break;
-                        case 'networks': displayName = 'Net'; break;
-                        case 'measurement': displayName = 'Meas'; break;
-                        case 'other': displayName = 'Other'; break;
-                        default: displayName = type;
-                    }
-                    
-                    var tag = document.createElement('span');
-                    tag.className = 'vendor-type-tag';
-                    tag.setAttribute('data-type', type);
-                    tag.innerHTML = displayName + '<span class="remove-type" onclick="removeVendorType(\'' + vendorId + '\', \'' + type + '\', event)">&times;</span>';
-                    container.appendChild(tag);
-                } else {
-                    console.error('Error adding vendor type:', data.error);
-                    if (data.error === 'Invalid password') {
-                        updatePassword = ''; // Clear invalid password
-                        alert('Invalid password. Please try again.');
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error adding vendor type:', error);
-            });
-        }
-        
-        // Function to remove vendor type
-        function removeVendorType(vendorId, type, event) {
-            if (!getPasswordIfNeeded()) return;
-            
-            event.stopPropagation();
-            
-            // Get current vendor types
-            var container = document.getElementById('vendor-type-container-' + vendorId);
-            var existingTags = container.querySelectorAll('.vendor-type-tag');
-            var currentTypes = [];
-            
-            existingTags.forEach(function(tag) {
-                var tagType = tag.getAttribute('data-type');
-                if (tagType !== type) {
-                    currentTypes.push(tagType);
-                }
-            });
-            
-            console.log("Updating vendor types for vendor " + vendorId + " to " + JSON.stringify(currentTypes));
-            
-            // Send the update to the server
-            fetch('/update_vendor', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    vendorId: vendorId,
-                    field: 'vendorTypes',
-                    value: currentTypes,
-                    password: updatePassword
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Server response:", data);
-                if (data.success) {
-                    // Remove the tag from the UI
-                    var tagToRemove = null;
-                    existingTags.forEach(function(tag) {
-                        if (tag.getAttribute('data-type') === type) {
-                            tagToRemove = tag;
-                        }
-                    });
-                    
-                    if (tagToRemove) {
-                        container.removeChild(tagToRemove);
-                    }
-                } else {
-                    console.error('Error removing vendor type:', data.error);
-                    if (data.error === 'Invalid password') {
-                        updatePassword = ''; // Clear invalid password
-                        alert('Invalid password. Please try again.');
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error removing vendor type:', error);
-            });
-        }
-        
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!e.target.matches('.add-type-button') && !e.target.closest('.vendor-type-dropdown-content')) {
-                document.querySelectorAll('.vendor-type-dropdown-content').forEach(function(dropdown) {
-                    dropdown.style.display = 'none';
-                });
-            }
-        });
-        
-        // JavaScript for filtering vendors
-        function filterVendors() {
-            // Get the search input value
-            var input = document.getElementById("vendorSearch");
-            var filter = input.value.toUpperCase();
-            
-            // Apply both search and status filters
-            applyFilters(filter, currentStatusFilter);
-        }
-        
-        // Current active filter
-        var currentStatusFilter = 'all';
-        
-        // Function to filter vendors based on status
-        function filterByStatus(status) {
-            // Update the active filter button
-            document.getElementById("filterAll").classList.remove("active");
-            document.getElementById("filterPartner").classList.remove("active");
-            document.getElementById("filterShortlist").classList.remove("active");
-            
-            document.getElementById("filter" + status.charAt(0).toUpperCase() + status.slice(1)).classList.add("active");
-            
-            // Update current filter
-            currentStatusFilter = status;
-            
-            // Get the current search filter
-            var input = document.getElementById("vendorSearch");
-            var filter = input.value.toUpperCase();
-            
-            // Apply both filters
-            applyFilters(filter, status);
-        }
-        
-        // Function to apply both search and status filters
-        function applyFilters(searchFilter, statusFilter) {
             var table = document.getElementById("vendorTable");
             var tr = table.getElementsByTagName("tr");
             var visibleCount = 0;
             
-            // Loop through all table rows, and hide those who don't match the filters
+            // Loop through all table rows, and hide those who don't match the search query
             for (var i = 1; i < tr.length; i++) { // Start from 1 to skip header row
                 var nameCell = tr[i].getElementsByTagName("td")[1];
                 var statusCell = tr[i].getElementsByTagName("td")[2];
+                var typeCell = tr[i].getElementsByTagName("td")[3];
+                var mblCell = tr[i].getElementsByTagName("td")[4];
                 
-                if (nameCell && statusCell) {
+                if (nameCell && statusCell && typeCell && mblCell) {
                     var nameValue = nameCell.textContent || nameCell.innerText;
-                    var statusSelect = statusCell.getElementsByTagName("select")[0];
-                    var statusValue = statusSelect ? statusSelect.value : "";
+                    var statusTag = statusCell.querySelector(".status-tag");
+                    var statusValue = statusTag ? statusTag.textContent.trim() : "";
+                    var typeTags = typeCell.getElementsByClassName("vendor-type-tag");
+                    var typeValues = [];
+                    
+                    for (var j = 0; j < typeTags.length; j++) {
+                        typeValues.push(typeTags[j].getAttribute("data-type"));
+                    }
+                    
+                    var mblTag = mblCell.querySelector(".mbl-tag");
+                    var mblValue = mblTag ? mblTag.textContent.trim() : "";
+                    
+                    // Check purpose/feature filters
+                    var matchesPurpose = true;
+                    if (purposeFilter !== 'all') {
+                        var purposeIndex = parseInt(purposeFilter.substring(1)) + 4; // p1 is at index 5
+                        var purposeCell = tr[i].getElementsByTagName("td")[purposeIndex];
+                        var purposeIcon = purposeCell.querySelector("i");
+                        matchesPurpose = purposeIcon.classList.contains("purpose-yes");
+                    }
+                    
+                    var matchesSpecialPurpose = true;
+                    if (specialPurposeFilter !== 'all') {
+                        var spIndex = parseInt(specialPurposeFilter.substring(2)) + 14; // sp1 is at index 15
+                        var spCell = tr[i].getElementsByTagName("td")[spIndex];
+                        var spIcon = spCell.querySelector("i");
+                        matchesSpecialPurpose = spIcon.classList.contains("purpose-yes");
+                    }
+                    
+                    var matchesFeature = true;
+                    if (featureFilter !== 'all') {
+                        var fIndex = parseInt(featureFilter.substring(1)) + 16; // f1 is at index 17
+                        var fCell = tr[i].getElementsByTagName("td")[fIndex];
+                        var fIcon = fCell.querySelector("i");
+                        matchesFeature = fIcon.classList.contains("purpose-yes");
+                    }
+                    
+                    var matchesSpecialFeature = true;
+                    if (specialFeatureFilter !== 'all') {
+                        var sfIndex = parseInt(specialFeatureFilter.substring(2)) + 19; // sf1 is at index 20
+                        var sfCell = tr[i].getElementsByTagName("td")[sfIndex];
+                        var sfIcon = sfCell.querySelector("i");
+                        matchesSpecialFeature = sfIcon.classList.contains("purpose-yes");
+                    }
                     
                     var matchesSearch = nameValue.toUpperCase().indexOf(searchFilter) > -1;
-                    var matchesStatus = statusFilter === 'all' || statusValue === statusFilter;
+                    var matchesStatus = statusFilter === 'all' || 
+                                       (statusFilter === 'none' && statusValue === 'None') || 
+                                       statusValue === statusFilter;
+                    var matchesType = typeFilter === 'all' || 
+                                     (typeFilter === 'none' && typeValues.length === 0) || 
+                                     typeValues.includes(typeFilter);
+                    var matchesMBL = mblFilter === 'all' || mblValue === mblFilter;
                     
-                    if (matchesSearch && matchesStatus) {
+                    if (matchesSearch && matchesStatus && matchesType && matchesMBL && 
+                        matchesPurpose && matchesSpecialPurpose && matchesFeature && matchesSpecialFeature) {
                         tr[i].style.display = "";
                         visibleCount++;
                     } else {
@@ -973,12 +527,14 @@
                 }
             }
             
-            // Update the search count
-            var searchCount = document.getElementById("searchCount");
-            if (searchCount) {
-                searchCount.textContent = visibleCount + " vendors";
-            }
+            // Update the results count
+            document.getElementById("resultsCount").textContent = "Showing " + visibleCount + " of " + (tr.length - 1) + " vendors";
         }
+        
+        // Initialize the table filter
+        document.addEventListener('DOMContentLoaded', function() {
+            filterTable();
+        });
     </script>
 </body>
 </html> 
