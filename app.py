@@ -59,42 +59,63 @@ def ensure_all_vendors_in_data():
     # Add entries for all vendors in GVL with complete data structure
     updated = False
     for vendor_id, vendor_info in gvl_data['vendors'].items():
+        # Process purposes according to the new rules
+        purpose_values = {}
+        
+        # Process regular purposes (P1-P10)
+        for i in range(1, 11):
+            purpose_str = str(i)
+            
+            # Check if in flexiblePurposes
+            if 'flexiblePurposes' in vendor_info and purpose_str in map(str, vendor_info['flexiblePurposes']):
+                purpose_values[f'p{i}'] = "C, LI"
+            # Check if in legIntPurposes
+            elif 'legIntPurposes' in vendor_info and purpose_str in map(str, vendor_info['legIntPurposes']):
+                purpose_values[f'p{i}'] = "LI"
+            # Check if in purposes
+            elif 'purposes' in vendor_info and purpose_str in map(str, vendor_info['purposes']):
+                purpose_values[f'p{i}'] = "C"
+            else:
+                purpose_values[f'p{i}'] = "-"
+        
+        # Process special purposes (SP1-SP2)
+        for i in range(1, 3):
+            purpose_str = str(i)
+            
+            # Check if in specialPurposes
+            if 'specialPurposes' in vendor_info and purpose_str in map(str, vendor_info['specialPurposes']):
+                purpose_values[f'sp{i}'] = "LI"
+            else:
+                purpose_values[f'sp{i}'] = "-"
+        
+        # Process features (F1-F3)
+        for i in range(1, 4):
+            feature_str = str(i)
+            
+            # Check if in features
+            if 'features' in vendor_info and feature_str in map(str, vendor_info['features']):
+                purpose_values[f'f{i}'] = "LI"
+            else:
+                purpose_values[f'f{i}'] = "-"
+        
+        # Process special features (SF1-SF2)
+        for i in range(1, 3):
+            feature_str = str(i)
+            
+            # Check if in specialFeatures
+            if 'specialFeatures' in vendor_info and feature_str in map(str, vendor_info['specialFeatures']):
+                purpose_values[f'sf{i}'] = "C"
+            else:
+                purpose_values[f'sf{i}'] = "-"
+        
         # Create default structure for this vendor
         default_vendor_data = {
             'name': vendor_info['name'],
             'status': '',
             'mblAudited': 'No/Unknown',
             'vendorTypes': [],
-            'p1': 0, 'p2': 0, 'p3': 0, 'p4': 0, 'p5': 0,
-            'p6': 0, 'p7': 0, 'p8': 0, 'p9': 0, 'p10': 0,
-            'sp1': 0, 'sp2': 0,
-            'f1': 0, 'f2': 0, 'f3': 0,
-            'sf1': 0, 'sf2': 0
+            **purpose_values  # Add all the purpose values
         }
-        
-        # Process purposes from GVL
-        if 'purposes' in vendor_info:
-            for purpose_id in vendor_info['purposes']:
-                if 1 <= int(purpose_id) <= 10:
-                    default_vendor_data[f'p{purpose_id}'] = 1
-        
-        # Process special purposes from GVL
-        if 'specialPurposes' in vendor_info:
-            for purpose_id in vendor_info['specialPurposes']:
-                if 1 <= int(purpose_id) <= 2:
-                    default_vendor_data[f'sp{purpose_id}'] = 1
-        
-        # Process features from GVL
-        if 'features' in vendor_info:
-            for feature_id in vendor_info['features']:
-                if 1 <= int(feature_id) <= 3:
-                    default_vendor_data[f'f{feature_id}'] = 1
-        
-        # Process special features from GVL
-        if 'specialFeatures' in vendor_info:
-            for feature_id in vendor_info['specialFeatures']:
-                if 1 <= int(feature_id) <= 2:
-                    default_vendor_data[f'sf{feature_id}'] = 1
         
         if vendor_id not in vendor_data['vendors']:
             # If vendor doesn't exist in our data, add it with default values
@@ -107,6 +128,11 @@ def ensure_all_vendors_in_data():
             # Always update the name from GVL
             if existing_vendor.get('name') != vendor_info['name']:
                 existing_vendor['name'] = vendor_info['name']
+                updated = True
+            
+            # Update purpose values
+            for key, value in purpose_values.items():
+                existing_vendor[key] = value
                 updated = True
             
             # Ensure all fields exist
@@ -151,23 +177,23 @@ def process_vendor_data():
                 'status': custom_data.get('status', ''),
                 'mblAudited': custom_data.get('mblAudited', 'No/Unknown'),
                 'vendorTypes': custom_data.get('vendorTypes', []),
-                'p1': custom_data.get('p1', 0), 
-                'p2': custom_data.get('p2', 0), 
-                'p3': custom_data.get('p3', 0), 
-                'p4': custom_data.get('p4', 0), 
-                'p5': custom_data.get('p5', 0),
-                'p6': custom_data.get('p6', 0), 
-                'p7': custom_data.get('p7', 0), 
-                'p8': custom_data.get('p8', 0), 
-                'p9': custom_data.get('p9', 0), 
-                'p10': custom_data.get('p10', 0),
-                'sp1': custom_data.get('sp1', 0), 
-                'sp2': custom_data.get('sp2', 0),
-                'f1': custom_data.get('f1', 0), 
-                'f2': custom_data.get('f2', 0), 
-                'f3': custom_data.get('f3', 0),
-                'sf1': custom_data.get('sf1', 0), 
-                'sf2': custom_data.get('sf2', 0)
+                'p1': custom_data.get('p1', '-'), 
+                'p2': custom_data.get('p2', '-'), 
+                'p3': custom_data.get('p3', '-'), 
+                'p4': custom_data.get('p4', '-'), 
+                'p5': custom_data.get('p5', '-'),
+                'p6': custom_data.get('p6', '-'), 
+                'p7': custom_data.get('p7', '-'), 
+                'p8': custom_data.get('p8', '-'), 
+                'p9': custom_data.get('p9', '-'), 
+                'p10': custom_data.get('p10', '-'),
+                'sp1': custom_data.get('sp1', '-'), 
+                'sp2': custom_data.get('sp2', '-'),
+                'f1': custom_data.get('f1', '-'), 
+                'f2': custom_data.get('f2', '-'), 
+                'f3': custom_data.get('f3', '-'),
+                'sf1': custom_data.get('sf1', '-'), 
+                'sf2': custom_data.get('sf2', '-')
             }
             
             vendors.append(vendor)
