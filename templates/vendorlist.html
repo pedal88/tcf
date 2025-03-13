@@ -57,15 +57,15 @@
         }
         
         .table th:nth-child(3), .table td:nth-child(3) { /* Status */
-            width: 100px;
+            width: 80px; /* Reduced from 100px */
         }
         
         .table th:nth-child(4), .table td:nth-child(4) { /* Vendor Type */
-            width: 220px;
+            width: 180px; /* Reduced from 220px */
         }
         
         .table th:nth-child(5), .table td:nth-child(5) { /* MBL Audited */
-            width: 100px;
+            width: 80px; /* Reduced from 100px */
         }
         
         /* Purpose columns - fixed width */
@@ -73,6 +73,7 @@
             width: 50px;
             max-width: 50px;
             min-width: 50px;
+            padding: 0.15rem 0.1rem;
         }
         
         /* Vendor name truncation */
@@ -86,11 +87,12 @@
         .status-tag {
             display: inline-flex;
             align-items: center;
-            border-radius: 0.25rem;
-            padding: 0.125rem 0.375rem;
-            font-size: 0.7rem;
-            font-weight: 600;
+            border-radius: 0.2rem; /* Smaller border radius */
+            padding: 0.1rem 0.15rem; /* Reduced padding */
+            font-size: 0.65rem; /* Smaller font size */
+            font-weight: 700; /* Bolder text */
             width: fit-content;
+            line-height: 1; /* Tighter line height */
         }
         
         .status-partner {
@@ -115,26 +117,28 @@
         .vendor-type-tag {
             display: inline-flex;
             align-items: center;
-            border-radius: 0.25rem;
-            padding: 0.125rem 0.375rem;
-            margin-right: 0.25rem;
-            margin-bottom: 0.25rem;
-            font-size: 0.7rem;
-            font-weight: 600;
+            border-radius: 0.2rem; /* Smaller border radius */
+            padding: 0.1rem 0.15rem; /* Reduced padding */
+            margin-right: 0.15rem; /* Reduced margin */
+            margin-bottom: 0.15rem; /* Reduced margin */
+            font-size: 0.65rem; /* Smaller font size */
+            font-weight: 700; /* Bolder text */
             background-color: #f8f9fa;
             border: 1px solid #ced4da;
             color: #6c757d;
+            line-height: 1; /* Tighter line height */
         }
         
         /* MBL Audited tag styling */
         .mbl-tag {
             display: inline-flex;
             align-items: center;
-            border-radius: 0.25rem;
-            padding: 0.125rem 0.375rem;
-            font-size: 0.7rem;
-            font-weight: 600;
+            border-radius: 0.2rem; /* Smaller border radius */
+            padding: 0.1rem 0.15rem; /* Reduced padding */
+            font-size: 0.65rem; /* Smaller font size */
+            font-weight: 700; /* Bolder text */
             width: fit-content;
+            line-height: 1; /* Tighter line height */
         }
         
         .mbl-yes {
@@ -152,37 +156,46 @@
         /* Purpose label styling */
         .purpose-label {
             display: inline-block;
-            border-radius: 0.25rem;
-            padding: 0.15rem 0.3rem;
-            font-size: 0.7rem;
-            font-weight: 700; /* Bolder text */
-            width: 100%;
-            max-width: 30px;
+            border-radius: 0.2rem;
+            padding: 0.1rem 0.15rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            width: 20px;
             text-align: center;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1); /* Add subtle shadow */
-            background-color: #f8f9fa;
-            border: 1px solid #ced4da;
+            margin: 0 1px;
+            line-height: 1;
         }
         
         .purpose-c-label {
-            color: #28a745; /* Green text */
-            border-color: #28a745; /* Green border */
+            color: #842029;
+            border: 1px solid #f5c2c7;
+            background-color: #f8d7da;
         }
         
         .purpose-li-label {
-            color: #0d6efd; /* Blue text */
-            border-color: #0d6efd; /* Blue border */
+            color: #084298;
+            border: 1px solid #b6d4fe;
+            background-color: #cfe2ff;
         }
         
         .purpose-none {
             color: #adb5bd;
+            font-size: 0.65rem;
+        }
+        
+        /* Purpose container for side-by-side display */
+        .purpose-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: nowrap;
         }
         
         /* Filter styling */
         .filter-container {
             background-color: #f8f9fa;
             border-radius: 0.375rem;
-            padding: 1rem;
+            padding: 0.75rem; /* Reduced padding */
             margin-bottom: 1rem;
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
         }
@@ -190,7 +203,7 @@
         .filter-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.75rem; /* Reduced gap */
             margin-bottom: 0.5rem;
         }
         
@@ -209,15 +222,47 @@
         
         .filter-control {
             padding: 0.25rem 0.5rem;
-            font-size: 0.875rem;
+            font-size: 0.75rem; /* Smaller font size */
             border-radius: 0.25rem;
             border: 1px solid #ced4da;
         }
         
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .filter-btn {
+            font-size: 0.75rem; /* Smaller font size */
+            padding: 0.25rem 0.75rem; /* Reduced padding */
+            border-radius: 0.25rem;
+            font-weight: 600;
+        }
+        
+        .filter-btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            color: white;
+        }
+        
+        .filter-btn-secondary {
+            background-color: #f8f9fa;
+            border-color: #ced4da;
+            color: #6c757d;
+        }
+        
         .results-count {
-            font-size: 0.875rem;
+            font-size: 0.75rem; /* Smaller font size */
             font-weight: 600;
             color: #6c757d;
+            margin-top: 0.5rem;
+        }
+        
+        /* Purpose cell styling */
+        .purpose-cell {
+            text-align: center;
+            padding: 0.15rem 0.05rem;
         }
     </style>
 </head>
@@ -253,78 +298,51 @@
         </div>
     </nav>
     
-    <div class="container-fluid">
-        <!-- Filter Section -->
+    <div class="container">
         <div class="filter-container">
             <form method="GET" action="/vendorlist">
                 <div class="filter-row">
                     <div class="filter-group">
-                        <label class="filter-label" for="search">Search Vendor</label>
-                        <input type="text" class="filter-control" id="search" name="search" value="{{ request.args.get('search', '') }}" placeholder="Vendor name...">
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label" for="status">Status</label>
-                        <select class="filter-control" id="status" name="status">
-                            <option value="" {% if not request.args.get('status') %}selected{% endif %}>All</option>
+                        <label for="status" class="filter-label">Status</label>
+                        <select name="status" id="status" class="filter-control">
+                            <option value="">All</option>
                             <option value="Partner" {% if request.args.get('status') == 'Partner' %}selected{% endif %}>Partner</option>
                             <option value="Shortlist" {% if request.args.get('status') == 'Shortlist' %}selected{% endif %}>Shortlist</option>
                             <option value="None" {% if request.args.get('status') == 'None' %}selected{% endif %}>None</option>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label class="filter-label" for="vendorType">Vendor Type</label>
-                        <select class="filter-control" id="vendorType" name="vendorType">
-                            <option value="" {% if not request.args.get('vendorType') %}selected{% endif %}>All</option>
-                            {% for type in vendor_types %}
-                                <option value="{{ type }}" {% if request.args.get('vendorType') == type %}selected{% endif %}>{{ type }}</option>
-                            {% endfor %}
+                        <label for="vendor_type" class="filter-label">Vendor Type</label>
+                        <select name="vendor_type" id="vendor_type" class="filter-control">
+                            <option value="">All</option>
+                            <option value="SSP" {% if request.args.get('vendor_type') == 'SSP' %}selected{% endif %}>SSP</option>
+                            <option value="DSP" {% if request.args.get('vendor_type') == 'DSP' %}selected{% endif %}>DSP</option>
+                            <option value="DMP" {% if request.args.get('vendor_type') == 'DMP' %}selected{% endif %}>DMP</option>
+                            <option value="Data Provider" {% if request.args.get('vendor_type') == 'Data Provider' %}selected{% endif %}>Data Provider</option>
+                            <option value="Agency" {% if request.args.get('vendor_type') == 'Agency' %}selected{% endif %}>Agency</option>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label class="filter-label" for="mblAudited">MBL Audited</label>
-                        <select class="filter-control" id="mblAudited" name="mblAudited">
-                            <option value="" {% if not request.args.get('mblAudited') %}selected{% endif %}>All</option>
-                            <option value="Yes" {% if request.args.get('mblAudited') == 'Yes' %}selected{% endif %}>Yes</option>
-                            <option value="No" {% if request.args.get('mblAudited') == 'No' %}selected{% endif %}>No/Unknown</option>
+                        <label for="mbl_audited" class="filter-label">MBL Audited</label>
+                        <select name="mbl_audited" id="mbl_audited" class="filter-control">
+                            <option value="">All</option>
+                            <option value="Yes" {% if request.args.get('mbl_audited') == 'Yes' %}selected{% endif %}>Yes</option>
+                            <option value="No" {% if request.args.get('mbl_audited') == 'No' %}selected{% endif %}>No</option>
                         </select>
                     </div>
                 </div>
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label class="filter-label" for="purpose">Purpose</label>
-                        <select class="filter-control" id="purpose" name="purpose">
-                            <option value="" {% if not request.args.get('purpose') %}selected{% endif %}>All</option>
-                            <option value="p1" {% if request.args.get('purpose') == 'p1' %}selected{% endif %}>P1: Store and/or access information on a device</option>
-                            <option value="p2" {% if request.args.get('purpose') == 'p2' %}selected{% endif %}>P2: Select basic ads</option>
-                            <option value="p3" {% if request.args.get('purpose') == 'p3' %}selected{% endif %}>P3: Create a personalised ads profile</option>
-                            <option value="p4" {% if request.args.get('purpose') == 'p4' %}selected{% endif %}>P4: Select personalised ads</option>
-                            <option value="p5" {% if request.args.get('purpose') == 'p5' %}selected{% endif %}>P5: Create a personalised content profile</option>
-                            <option value="p6" {% if request.args.get('purpose') == 'p6' %}selected{% endif %}>P6: Select personalised content</option>
-                            <option value="p7" {% if request.args.get('purpose') == 'p7' %}selected{% endif %}>P7: Measure ad performance</option>
-                            <option value="p8" {% if request.args.get('purpose') == 'p8' %}selected{% endif %}>P8: Measure content performance</option>
-                            <option value="p9" {% if request.args.get('purpose') == 'p9' %}selected{% endif %}>P9: Apply market research to generate audience insights</option>
-                            <option value="p10" {% if request.args.get('purpose') == 'p10' %}selected{% endif %}>P10: Develop and improve products</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label" for="purposeType">Purpose Type</label>
-                        <select class="filter-control" id="purposeType" name="purposeType">
-                            <option value="" {% if not request.args.get('purposeType') %}selected{% endif %}>All</option>
-                            <option value="C" {% if request.args.get('purposeType') == 'C' %}selected{% endif %}>Consent</option>
-                            <option value="LI" {% if request.args.get('purposeType') == 'LI' %}selected{% endif %}>Legitimate Interest</option>
-                        </select>
-                    </div>
-                    <div class="filter-group d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary">Filter</button>
-                        <a href="/vendorlist" class="btn btn-secondary ms-2">Reset</a>
-                    </div>
+                <div class="filter-buttons">
+                    <button type="submit" class="btn filter-btn filter-btn-primary">
+                        <i class="bi bi-funnel"></i> Filter
+                    </button>
+                    <a href="/vendorlist" class="btn filter-btn filter-btn-secondary">
+                        <i class="bi bi-x-circle"></i> Reset
+                    </a>
                 </div>
             </form>
-        </div>
-        
-        <!-- Results Count -->
-        <div class="results-count mb-2">
-            Showing {{ vendors|length }} vendors
+            <div class="results-count">
+                Showing {{ vendors|length }} vendors
+            </div>
         </div>
         
         <!-- Vendor Table -->
@@ -393,6 +411,7 @@
                         
                         <!-- P1 -->
                         <td class="purpose-cell">
+                            <div class="purpose-container">
                             {% if vendor.p1 is defined and vendor.p1 %}
                                 {% if vendor.p1 is iterable and vendor.p1 is not string %}
                                     {% for value in vendor.p1 %}
@@ -402,7 +421,7 @@
                                             <span class="purpose-label purpose-li-label">LI</span>
                                         {% endif %}
                                     {% endfor %}
-                                {% elif vendor.p1 == "C, LI" %}
+                                {% elif vendor.p1 == "C, LI" or vendor.p1 == "C,LI" %}
                                     <span class="purpose-label purpose-c-label">C</span>
                                     <span class="purpose-label purpose-li-label">LI</span>
                                 {% elif vendor.p1 == "C" %}
@@ -415,10 +434,12 @@
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
+                            </div>
                         </td>
                         
                         <!-- P2 -->
                         <td class="purpose-cell">
+                            <div class="purpose-container">
                             {% if vendor.p2 is defined and vendor.p2 %}
                                 {% if vendor.p2 is iterable and vendor.p2 is not string %}
                                     {% for value in vendor.p2 %}
@@ -428,7 +449,7 @@
                                             <span class="purpose-label purpose-li-label">LI</span>
                                         {% endif %}
                                     {% endfor %}
-                                {% elif vendor.p2 == "C, LI" %}
+                                {% elif vendor.p2 == "C, LI" or vendor.p2 == "C,LI" %}
                                     <span class="purpose-label purpose-c-label">C</span>
                                     <span class="purpose-label purpose-li-label">LI</span>
                                 {% elif vendor.p2 == "C" %}
@@ -441,10 +462,12 @@
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
+                            </div>
                         </td>
                         
                         <!-- P3 -->
                         <td class="purpose-cell">
+                            <div class="purpose-container">
                             {% if vendor.p3 is defined and vendor.p3 %}
                                 {% if vendor.p3 is iterable and vendor.p3 is not string %}
                                     {% for value in vendor.p3 %}
@@ -454,7 +477,7 @@
                                             <span class="purpose-label purpose-li-label">LI</span>
                                         {% endif %}
                                     {% endfor %}
-                                {% elif vendor.p3 == "C, LI" %}
+                                {% elif vendor.p3 == "C, LI" or vendor.p3 == "C,LI" %}
                                     <span class="purpose-label purpose-c-label">C</span>
                                     <span class="purpose-label purpose-li-label">LI</span>
                                 {% elif vendor.p3 == "C" %}
@@ -467,10 +490,12 @@
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
+                            </div>
                         </td>
                         
                         <!-- P4 -->
                         <td class="purpose-cell">
+                            <div class="purpose-container">
                             {% if vendor.p4 is defined and vendor.p4 %}
                                 {% if vendor.p4 is iterable and vendor.p4 is not string %}
                                     {% for value in vendor.p4 %}
@@ -480,7 +505,7 @@
                                             <span class="purpose-label purpose-li-label">LI</span>
                                         {% endif %}
                                     {% endfor %}
-                                {% elif vendor.p4 == "C, LI" %}
+                                {% elif vendor.p4 == "C, LI" or vendor.p4 == "C,LI" %}
                                     <span class="purpose-label purpose-c-label">C</span>
                                     <span class="purpose-label purpose-li-label">LI</span>
                                 {% elif vendor.p4 == "C" %}
@@ -493,10 +518,12 @@
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
+                            </div>
                         </td>
                         
                         <!-- P5 -->
                         <td class="purpose-cell">
+                            <div class="purpose-container">
                             {% if vendor.p5 is defined and vendor.p5 %}
                                 {% if vendor.p5 is iterable and vendor.p5 is not string %}
                                     {% for value in vendor.p5 %}
@@ -506,7 +533,7 @@
                                             <span class="purpose-label purpose-li-label">LI</span>
                                         {% endif %}
                                     {% endfor %}
-                                {% elif vendor.p5 == "C, LI" %}
+                                {% elif vendor.p5 == "C, LI" or vendor.p5 == "C,LI" %}
                                     <span class="purpose-label purpose-c-label">C</span>
                                     <span class="purpose-label purpose-li-label">LI</span>
                                 {% elif vendor.p5 == "C" %}
@@ -519,11 +546,12 @@
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
+                            </div>
                         </td>
                         
-                        <!-- Continue with P6-P10, SP1-SP2, F1-F3, SF1-SF2 following the same pattern -->
                         <!-- P6 -->
                         <td class="purpose-cell">
+                            <div class="purpose-container">
                             {% if vendor.p6 is defined and vendor.p6 %}
                                 {% if vendor.p6 is iterable and vendor.p6 is not string %}
                                     {% for value in vendor.p6 %}
@@ -533,7 +561,7 @@
                                             <span class="purpose-label purpose-li-label">LI</span>
                                         {% endif %}
                                     {% endfor %}
-                                {% elif vendor.p6 == "C, LI" %}
+                                {% elif vendor.p6 == "C, LI" or vendor.p6 == "C,LI" %}
                                     <span class="purpose-label purpose-c-label">C</span>
                                     <span class="purpose-label purpose-li-label">LI</span>
                                 {% elif vendor.p6 == "C" %}
@@ -546,10 +574,12 @@
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
+                            </div>
                         </td>
                         
                         <!-- P7 -->
                         <td class="purpose-cell">
+                            <div class="purpose-container">
                             {% if vendor.p7 is defined and vendor.p7 %}
                                 {% if vendor.p7 is iterable and vendor.p7 is not string %}
                                     {% for value in vendor.p7 %}
@@ -559,7 +589,7 @@
                                             <span class="purpose-label purpose-li-label">LI</span>
                                         {% endif %}
                                     {% endfor %}
-                                {% elif vendor.p7 == "C, LI" %}
+                                {% elif vendor.p7 == "C, LI" or vendor.p7 == "C,LI" %}
                                     <span class="purpose-label purpose-c-label">C</span>
                                     <span class="purpose-label purpose-li-label">LI</span>
                                 {% elif vendor.p7 == "C" %}
@@ -572,10 +602,12 @@
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
+                            </div>
                         </td>
                         
                         <!-- P8 -->
                         <td class="purpose-cell">
+                            <div class="purpose-container">
                             {% if vendor.p8 is defined and vendor.p8 %}
                                 {% if vendor.p8 is iterable and vendor.p8 is not string %}
                                     {% for value in vendor.p8 %}
@@ -585,7 +617,7 @@
                                             <span class="purpose-label purpose-li-label">LI</span>
                                         {% endif %}
                                     {% endfor %}
-                                {% elif vendor.p8 == "C, LI" %}
+                                {% elif vendor.p8 == "C, LI" or vendor.p8 == "C,LI" %}
                                     <span class="purpose-label purpose-c-label">C</span>
                                     <span class="purpose-label purpose-li-label">LI</span>
                                 {% elif vendor.p8 == "C" %}
@@ -598,10 +630,12 @@
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
+                            </div>
                         </td>
                         
                         <!-- P9 -->
                         <td class="purpose-cell">
+                            <div class="purpose-container">
                             {% if vendor.p9 is defined and vendor.p9 %}
                                 {% if vendor.p9 is iterable and vendor.p9 is not string %}
                                     {% for value in vendor.p9 %}
@@ -611,7 +645,7 @@
                                             <span class="purpose-label purpose-li-label">LI</span>
                                         {% endif %}
                                     {% endfor %}
-                                {% elif vendor.p9 == "C, LI" %}
+                                {% elif vendor.p9 == "C, LI" or vendor.p9 == "C,LI" %}
                                     <span class="purpose-label purpose-c-label">C</span>
                                     <span class="purpose-label purpose-li-label">LI</span>
                                 {% elif vendor.p9 == "C" %}
@@ -624,10 +658,12 @@
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
+                            </div>
                         </td>
                         
                         <!-- P10 -->
                         <td class="purpose-cell">
+                            <div class="purpose-container">
                             {% if vendor.p10 is defined and vendor.p10 %}
                                 {% if vendor.p10 is iterable and vendor.p10 is not string %}
                                     {% for value in vendor.p10 %}
@@ -637,7 +673,7 @@
                                             <span class="purpose-label purpose-li-label">LI</span>
                                         {% endif %}
                                     {% endfor %}
-                                {% elif vendor.p10 == "C, LI" %}
+                                {% elif vendor.p10 == "C, LI" or vendor.p10 == "C,LI" %}
                                     <span class="purpose-label purpose-c-label">C</span>
                                     <span class="purpose-label purpose-li-label">LI</span>
                                 {% elif vendor.p10 == "C" %}
@@ -650,10 +686,12 @@
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
+                            </div>
                         </td>
                         
                         <!-- SP1 -->
                         <td class="purpose-cell">
+                            <div class="purpose-container">
                             {% if vendor.sp1 is defined and vendor.sp1 %}
                                 {% if vendor.sp1 is iterable and vendor.sp1 is not string %}
                                     {% for value in vendor.sp1 %}
@@ -663,7 +701,7 @@
                                             <span class="purpose-label purpose-li-label">LI</span>
                                         {% endif %}
                                     {% endfor %}
-                                {% elif vendor.sp1 == "C, LI" %}
+                                {% elif vendor.sp1 == "C, LI" or vendor.sp1 == "C,LI" %}
                                     <span class="purpose-label purpose-c-label">C</span>
                                     <span class="purpose-label purpose-li-label">LI</span>
                                 {% elif vendor.sp1 == "C" %}
@@ -676,10 +714,12 @@
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
+                            </div>
                         </td>
                         
                         <!-- SP2 -->
                         <td class="purpose-cell">
+                            <div class="purpose-container">
                             {% if vendor.sp2 is defined and vendor.sp2 %}
                                 {% if vendor.sp2 is iterable and vendor.sp2 is not string %}
                                     {% for value in vendor.sp2 %}
@@ -689,7 +729,7 @@
                                             <span class="purpose-label purpose-li-label">LI</span>
                                         {% endif %}
                                     {% endfor %}
-                                {% elif vendor.sp2 == "C, LI" %}
+                                {% elif vendor.sp2 == "C, LI" or vendor.sp2 == "C,LI" %}
                                     <span class="purpose-label purpose-c-label">C</span>
                                     <span class="purpose-label purpose-li-label">LI</span>
                                 {% elif vendor.sp2 == "C" %}
@@ -702,10 +742,12 @@
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
+                            </div>
                         </td>
                         
                         <!-- F1 -->
                         <td class="purpose-cell">
+                            <div class="purpose-container">
                             {% if vendor.f1 is defined and vendor.f1 %}
                                 {% if vendor.f1 is iterable and vendor.f1 is not string %}
                                     {% for value in vendor.f1 %}
@@ -715,7 +757,7 @@
                                             <span class="purpose-label purpose-li-label">LI</span>
                                         {% endif %}
                                     {% endfor %}
-                                {% elif vendor.f1 == "C, LI" %}
+                                {% elif vendor.f1 == "C, LI" or vendor.f1 == "C,LI" %}
                                     <span class="purpose-label purpose-c-label">C</span>
                                     <span class="purpose-label purpose-li-label">LI</span>
                                 {% elif vendor.f1 == "C" %}
@@ -728,10 +770,12 @@
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
+                            </div>
                         </td>
                         
                         <!-- F2 -->
                         <td class="purpose-cell">
+                            <div class="purpose-container">
                             {% if vendor.f2 is defined and vendor.f2 %}
                                 {% if vendor.f2 is iterable and vendor.f2 is not string %}
                                     {% for value in vendor.f2 %}
@@ -741,7 +785,7 @@
                                             <span class="purpose-label purpose-li-label">LI</span>
                                         {% endif %}
                                     {% endfor %}
-                                {% elif vendor.f2 == "C, LI" %}
+                                {% elif vendor.f2 == "C, LI" or vendor.f2 == "C,LI" %}
                                     <span class="purpose-label purpose-c-label">C</span>
                                     <span class="purpose-label purpose-li-label">LI</span>
                                 {% elif vendor.f2 == "C" %}
@@ -754,10 +798,12 @@
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
+                            </div>
                         </td>
                         
                         <!-- F3 -->
                         <td class="purpose-cell">
+                            <div class="purpose-container">
                             {% if vendor.f3 is defined and vendor.f3 %}
                                 {% if vendor.f3 is iterable and vendor.f3 is not string %}
                                     {% for value in vendor.f3 %}
@@ -767,7 +813,7 @@
                                             <span class="purpose-label purpose-li-label">LI</span>
                                         {% endif %}
                                     {% endfor %}
-                                {% elif vendor.f3 == "C, LI" %}
+                                {% elif vendor.f3 == "C, LI" or vendor.f3 == "C,LI" %}
                                     <span class="purpose-label purpose-c-label">C</span>
                                     <span class="purpose-label purpose-li-label">LI</span>
                                 {% elif vendor.f3 == "C" %}
@@ -780,10 +826,12 @@
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
+                            </div>
                         </td>
                         
                         <!-- SF1 -->
                         <td class="purpose-cell">
+                            <div class="purpose-container">
                             {% if vendor.sf1 is defined and vendor.sf1 %}
                                 {% if vendor.sf1 is iterable and vendor.sf1 is not string %}
                                     {% for value in vendor.sf1 %}
@@ -793,7 +841,7 @@
                                             <span class="purpose-label purpose-li-label">LI</span>
                                         {% endif %}
                                     {% endfor %}
-                                {% elif vendor.sf1 == "C, LI" %}
+                                {% elif vendor.sf1 == "C, LI" or vendor.sf1 == "C,LI" %}
                                     <span class="purpose-label purpose-c-label">C</span>
                                     <span class="purpose-label purpose-li-label">LI</span>
                                 {% elif vendor.sf1 == "C" %}
@@ -806,10 +854,12 @@
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
+                            </div>
                         </td>
                         
                         <!-- SF2 -->
                         <td class="purpose-cell">
+                            <div class="purpose-container">
                             {% if vendor.sf2 is defined and vendor.sf2 %}
                                 {% if vendor.sf2 is iterable and vendor.sf2 is not string %}
                                     {% for value in vendor.sf2 %}
@@ -819,7 +869,7 @@
                                             <span class="purpose-label purpose-li-label">LI</span>
                                         {% endif %}
                                     {% endfor %}
-                                {% elif vendor.sf2 == "C, LI" %}
+                                {% elif vendor.sf2 == "C, LI" or vendor.sf2 == "C,LI" %}
                                     <span class="purpose-label purpose-c-label">C</span>
                                     <span class="purpose-label purpose-li-label">LI</span>
                                 {% elif vendor.sf2 == "C" %}
@@ -832,6 +882,7 @@
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
