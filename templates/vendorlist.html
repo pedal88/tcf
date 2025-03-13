@@ -30,6 +30,7 @@
             margin-bottom: 0;
             table-layout: fixed;
             font-size: 0.8rem; /* Reduced table font size */
+            width: 100%;
         }
         
         .table th {
@@ -67,6 +68,13 @@
             width: 100px;
         }
         
+        /* Purpose columns - fixed width */
+        .table th:nth-child(n+6), .table td:nth-child(n+6) {
+            width: 50px;
+            max-width: 50px;
+            min-width: 50px;
+        }
+        
         /* Vendor name truncation */
         .table td:nth-child(2) {
             white-space: nowrap;
@@ -88,19 +96,37 @@
         .status-partner {
             background-color: #d1e7dd;
             border: 1px solid #badbcc;
+            color: #0f5132;
         }
         
         .status-shortlist {
             background-color: #fff3cd;
             border: 1px solid #ffecb5;
+            color: #664d03;
         }
         
         .status-none {
             background-color: #f8f9fa;
             border: 1px solid #ced4da;
+            color: #6c757d;
         }
         
-        /* MBL Audited styling */
+        /* Vendor type tag styling */
+        .vendor-type-tag {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 0.25rem;
+            padding: 0.125rem 0.375rem;
+            margin-right: 0.25rem;
+            margin-bottom: 0.25rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            color: #6c757d;
+        }
+        
+        /* MBL Audited tag styling */
         .mbl-tag {
             display: inline-flex;
             align-items: center;
@@ -114,59 +140,49 @@
         .mbl-yes {
             background-color: #d1e7dd;
             border: 1px solid #badbcc;
+            color: #0f5132;
         }
         
         .mbl-no {
             background-color: #f8f9fa;
             border: 1px solid #ced4da;
+            color: #6c757d;
         }
         
-        /* Vendor Type styling */
-        .vendor-type-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.25rem;
-        }
-        
-        .vendor-type-tag {
-            display: inline-flex;
-            align-items: center;
+        /* Purpose label styling */
+        .purpose-label {
+            display: inline-block;
+            border-radius: 0.25rem;
+            padding: 0.15rem 0.3rem;
+            font-size: 0.7rem;
+            font-weight: 700; /* Bolder text */
+            width: 100%;
+            max-width: 30px;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1); /* Add subtle shadow */
             background-color: #f8f9fa;
             border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-            padding: 0.125rem 0.375rem;
-            font-size: 0.7rem;
-            font-weight: 600;
         }
         
-        /* Purpose/Feature styling */
-        .purpose-cell {
-            text-align: center;
-            font-size: 0.7rem;
-            font-weight: 600;
+        .purpose-c-label {
+            color: #28a745; /* Green text */
+            border-color: #28a745; /* Green border */
         }
         
-        .purpose-c {
-            color: #198754;
-        }
-        
-        .purpose-li {
-            color: #0d6efd;
-        }
-        
-        .purpose-both {
-            color: #6f42c1;
+        .purpose-li-label {
+            color: #0d6efd; /* Blue text */
+            border-color: #0d6efd; /* Blue border */
         }
         
         .purpose-none {
             color: #adb5bd;
         }
         
-        /* Filter controls */
-        .filter-controls {
-            background-color: #fff;
+        /* Filter styling */
+        .filter-container {
+            background-color: #f8f9fa;
             border-radius: 0.375rem;
-            padding: 0.75rem;
+            padding: 1rem;
             margin-bottom: 1rem;
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
         }
@@ -174,41 +190,41 @@
         .filter-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
+            gap: 1rem;
             margin-bottom: 0.5rem;
         }
         
         .filter-group {
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            flex-direction: column;
+            min-width: 150px;
+            flex: 1;
         }
         
         .filter-label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            margin-bottom: 0;
-            white-space: nowrap;
+            margin-bottom: 0.25rem;
         }
         
         .filter-control {
-            font-size: 0.8rem;
             padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
             border-radius: 0.25rem;
             border: 1px solid #ced4da;
         }
         
         .results-count {
-            font-size: 0.8rem;
+            font-size: 0.875rem;
+            font-weight: 600;
             color: #6c757d;
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">TCF Vendor Explorer</a>
+        <div class="container">
+            <a class="navbar-brand" href="/">IAB TCF Vendor List</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -218,13 +234,19 @@
                         <a class="nav-link" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="/vendorlist">Vendor List</a>
+                        <a class="nav-link" href="/purposeslist">Purposeslist</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/purposeslist">Purposes List</a>
+                        <a class="nav-link active" href="/vendorlist">Vendorlist</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/vendor-management">Vendor Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/inspect-vendor">Inspect Vendor</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/compare-vendors">Compare Vendors</a>
                     </li>
                 </ul>
             </div>
@@ -232,95 +254,82 @@
     </nav>
     
     <div class="container-fluid">
-        <!-- Filter controls -->
-        <div class="filter-controls">
-            <div class="filter-row">
-                <div class="filter-group">
-                    <label for="searchInput" class="filter-label">Search:</label>
-                    <input type="text" id="searchInput" class="filter-control" placeholder="Vendor name..." onkeyup="filterTable()">
+        <!-- Filter Section -->
+        <div class="filter-container">
+            <form method="GET" action="/vendorlist">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label class="filter-label" for="search">Search Vendor</label>
+                        <input type="text" class="filter-control" id="search" name="search" value="{{ request.args.get('search', '') }}" placeholder="Vendor name...">
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label" for="status">Status</label>
+                        <select class="filter-control" id="status" name="status">
+                            <option value="" {% if not request.args.get('status') %}selected{% endif %}>All</option>
+                            <option value="Partner" {% if request.args.get('status') == 'Partner' %}selected{% endif %}>Partner</option>
+                            <option value="Shortlist" {% if request.args.get('status') == 'Shortlist' %}selected{% endif %}>Shortlist</option>
+                            <option value="None" {% if request.args.get('status') == 'None' %}selected{% endif %}>None</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label" for="vendorType">Vendor Type</label>
+                        <select class="filter-control" id="vendorType" name="vendorType">
+                            <option value="" {% if not request.args.get('vendorType') %}selected{% endif %}>All</option>
+                            {% for type in vendor_types %}
+                                <option value="{{ type }}" {% if request.args.get('vendorType') == type %}selected{% endif %}>{{ type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label" for="mblAudited">MBL Audited</label>
+                        <select class="filter-control" id="mblAudited" name="mblAudited">
+                            <option value="" {% if not request.args.get('mblAudited') %}selected{% endif %}>All</option>
+                            <option value="Yes" {% if request.args.get('mblAudited') == 'Yes' %}selected{% endif %}>Yes</option>
+                            <option value="No" {% if request.args.get('mblAudited') == 'No' %}selected{% endif %}>No/Unknown</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="filter-group">
-                    <label for="statusFilter" class="filter-label">Status:</label>
-                    <select id="statusFilter" class="filter-control" onchange="filterTable()">
-                        <option value="all">All</option>
-                        <option value="Partner">Partner</option>
-                        <option value="Shortlist">Shortlist</option>
-                        <option value="none">None</option>
-                    </select>
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label class="filter-label" for="purpose">Purpose</label>
+                        <select class="filter-control" id="purpose" name="purpose">
+                            <option value="" {% if not request.args.get('purpose') %}selected{% endif %}>All</option>
+                            <option value="p1" {% if request.args.get('purpose') == 'p1' %}selected{% endif %}>P1: Store and/or access information on a device</option>
+                            <option value="p2" {% if request.args.get('purpose') == 'p2' %}selected{% endif %}>P2: Select basic ads</option>
+                            <option value="p3" {% if request.args.get('purpose') == 'p3' %}selected{% endif %}>P3: Create a personalised ads profile</option>
+                            <option value="p4" {% if request.args.get('purpose') == 'p4' %}selected{% endif %}>P4: Select personalised ads</option>
+                            <option value="p5" {% if request.args.get('purpose') == 'p5' %}selected{% endif %}>P5: Create a personalised content profile</option>
+                            <option value="p6" {% if request.args.get('purpose') == 'p6' %}selected{% endif %}>P6: Select personalised content</option>
+                            <option value="p7" {% if request.args.get('purpose') == 'p7' %}selected{% endif %}>P7: Measure ad performance</option>
+                            <option value="p8" {% if request.args.get('purpose') == 'p8' %}selected{% endif %}>P8: Measure content performance</option>
+                            <option value="p9" {% if request.args.get('purpose') == 'p9' %}selected{% endif %}>P9: Apply market research to generate audience insights</option>
+                            <option value="p10" {% if request.args.get('purpose') == 'p10' %}selected{% endif %}>P10: Develop and improve products</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label" for="purposeType">Purpose Type</label>
+                        <select class="filter-control" id="purposeType" name="purposeType">
+                            <option value="" {% if not request.args.get('purposeType') %}selected{% endif %}>All</option>
+                            <option value="C" {% if request.args.get('purposeType') == 'C' %}selected{% endif %}>Consent</option>
+                            <option value="LI" {% if request.args.get('purposeType') == 'LI' %}selected{% endif %}>Legitimate Interest</option>
+                        </select>
+                    </div>
+                    <div class="filter-group d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                        <a href="/vendorlist" class="btn btn-secondary ms-2">Reset</a>
+                    </div>
                 </div>
-                <div class="filter-group">
-                    <label for="typeFilter" class="filter-label">Vendor Type:</label>
-                    <select id="typeFilter" class="filter-control" onchange="filterTable()">
-                        <option value="all">All</option>
-                        <option value="ssp">SSP</option>
-                        <option value="dsp">DSP</option>
-                        <option value="ads">Ads</option>
-                        <option value="networks">Networks</option>
-                        <option value="measurement">Measurement</option>
-                        <option value="other">Other</option>
-                        <option value="none">None</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="mblFilter" class="filter-label">MBL Audited:</label>
-                    <select id="mblFilter" class="filter-control" onchange="filterTable()">
-                        <option value="all">All</option>
-                        <option value="Yes">Yes</option>
-                        <option value="No/Unknown">No/Unknown</option>
-                    </select>
-                </div>
-            </div>
-            <div class="filter-row">
-                <div class="filter-group">
-                    <label for="purposeFilter" class="filter-label">Purpose:</label>
-                    <select id="purposeFilter" class="filter-control" onchange="filterTable()">
-                        <option value="all">All</option>
-                        <option value="p1">P1</option>
-                        <option value="p2">P2</option>
-                        <option value="p3">P3</option>
-                        <option value="p4">P4</option>
-                        <option value="p5">P5</option>
-                        <option value="p6">P6</option>
-                        <option value="p7">P7</option>
-                        <option value="p8">P8</option>
-                        <option value="p9">P9</option>
-                        <option value="p10">P10</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="specialPurposeFilter" class="filter-label">Special Purpose:</label>
-                    <select id="specialPurposeFilter" class="filter-control" onchange="filterTable()">
-                        <option value="all">All</option>
-                        <option value="sp1">SP1</option>
-                        <option value="sp2">SP2</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="featureFilter" class="filter-label">Feature:</label>
-                    <select id="featureFilter" class="filter-control" onchange="filterTable()">
-                        <option value="all">All</option>
-                        <option value="f1">F1</option>
-                        <option value="f2">F2</option>
-                        <option value="f3">F3</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="specialFeatureFilter" class="filter-label">Special Feature:</label>
-                    <select id="specialFeatureFilter" class="filter-control" onchange="filterTable()">
-                        <option value="all">All</option>
-                        <option value="sf1">SF1</option>
-                        <option value="sf2">SF2</option>
-                    </select>
-                </div>
-            </div>
-            <div class="filter-row">
-                <div id="resultsCount" class="results-count">Showing 0 of 0 vendors</div>
-            </div>
+            </form>
         </div>
         
-        <!-- Vendor table -->
+        <!-- Results Count -->
+        <div class="results-count mb-2">
+            Showing {{ vendors|length }} vendors
+        </div>
+        
+        <!-- Vendor Table -->
         <div class="table-responsive">
-            <table id="vendorTable" class="table table-striped table-bordered">
+            <table class="table table-striped table-bordered">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -351,224 +360,475 @@
                     {% for vendor in vendors %}
                     <tr>
                         <td>{{ vendor.id }}</td>
-                        <td title="{{ vendor.name }}">{{ vendor.name }}</td>
                         <td>
-                            {% if vendor.status %}
-                                <span class="status-tag {% if vendor.status == 'Partner' %}status-partner{% elif vendor.status == 'Shortlist' %}status-shortlist{% else %}status-none{% endif %}">
-                                    {{ vendor.status }}
-                                </span>
+                            <a href="/inspect-vendor?vendor_id={{ vendor.id }}" title="{{ vendor.name }}">
+                                {{ vendor.name }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if vendor.status == "Partner" %}
+                                <span class="status-tag status-partner">Partner</span>
+                            {% elif vendor.status == "Shortlist" %}
+                                <span class="status-tag status-shortlist">Shortlist</span>
                             {% else %}
                                 <span class="status-tag status-none">None</span>
                             {% endif %}
                         </td>
                         <td>
-                            <div class="vendor-type-container">
-                                {% if vendor.vendorTypes %}
-                                    {% for type in vendor.vendorTypes %}
-                                        <span class="vendor-type-tag" data-type="{{ type }}">
-                                            {% if type == 'ssp' %}SSP
-                                            {% elif type == 'dsp' %}DSP
-                                            {% elif type == 'ads' %}Ads
-                                            {% elif type == 'networks' %}Net
-                                            {% elif type == 'measurement' %}Meas
-                                            {% elif type == 'other' %}Other
-                                            {% else %}{{ type }}
-                                            {% endif %}
-                                        </span>
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
+                            {% if vendor.vendorTypes %}
+                                {% for type in vendor.vendorTypes %}
+                                    <span class="vendor-type-tag">{{ type }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
                         </td>
                         <td>
-                            {% if vendor.mblAudited == 'Yes' %}
+                            {% if vendor.mblAudited == "Yes" %}
                                 <span class="mbl-tag mbl-yes">Yes</span>
                             {% else %}
-                                <span class="mbl-tag mbl-no">No/Unknown</span>
+                                <span class="mbl-tag mbl-no">No</span>
                             {% endif %}
                         </td>
+                        
+                        <!-- P1 -->
                         <td class="purpose-cell">
-                            {% if vendor.p1 == "C, LI" %}
-                                <span class="purpose-both">C, LI</span>
-                            {% elif vendor.p1 == "C" %}
-                                <span class="purpose-c">C</span>
-                            {% elif vendor.p1 == "LI" %}
-                                <span class="purpose-li">LI</span>
+                            {% if vendor.p1 is defined and vendor.p1 %}
+                                {% if vendor.p1 is iterable and vendor.p1 is not string %}
+                                    {% for value in vendor.p1 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">C</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">LI</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif vendor.p1 == "C, LI" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% elif vendor.p1 == "C" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                {% elif vendor.p1 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% else %}
+                                    <span class="purpose-none">-</span>
+                                {% endif %}
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
                         </td>
+                        
+                        <!-- P2 -->
                         <td class="purpose-cell">
-                            {% if vendor.p2 == "C, LI" %}
-                                <span class="purpose-both">C, LI</span>
-                            {% elif vendor.p2 == "C" %}
-                                <span class="purpose-c">C</span>
-                            {% elif vendor.p2 == "LI" %}
-                                <span class="purpose-li">LI</span>
+                            {% if vendor.p2 is defined and vendor.p2 %}
+                                {% if vendor.p2 is iterable and vendor.p2 is not string %}
+                                    {% for value in vendor.p2 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">C</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">LI</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif vendor.p2 == "C, LI" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% elif vendor.p2 == "C" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                {% elif vendor.p2 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% else %}
+                                    <span class="purpose-none">-</span>
+                                {% endif %}
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
                         </td>
+                        
+                        <!-- P3 -->
                         <td class="purpose-cell">
-                            {% if vendor.p3 == "C, LI" %}
-                                <span class="purpose-both">C, LI</span>
-                            {% elif vendor.p3 == "C" %}
-                                <span class="purpose-c">C</span>
-                            {% elif vendor.p3 == "LI" %}
-                                <span class="purpose-li">LI</span>
+                            {% if vendor.p3 is defined and vendor.p3 %}
+                                {% if vendor.p3 is iterable and vendor.p3 is not string %}
+                                    {% for value in vendor.p3 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">C</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">LI</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif vendor.p3 == "C, LI" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% elif vendor.p3 == "C" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                {% elif vendor.p3 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% else %}
+                                    <span class="purpose-none">-</span>
+                                {% endif %}
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
                         </td>
+                        
+                        <!-- P4 -->
                         <td class="purpose-cell">
-                            {% if vendor.p4 == "C, LI" %}
-                                <span class="purpose-both">C, LI</span>
-                            {% elif vendor.p4 == "C" %}
-                                <span class="purpose-c">C</span>
-                            {% elif vendor.p4 == "LI" %}
-                                <span class="purpose-li">LI</span>
+                            {% if vendor.p4 is defined and vendor.p4 %}
+                                {% if vendor.p4 is iterable and vendor.p4 is not string %}
+                                    {% for value in vendor.p4 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">C</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">LI</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif vendor.p4 == "C, LI" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% elif vendor.p4 == "C" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                {% elif vendor.p4 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% else %}
+                                    <span class="purpose-none">-</span>
+                                {% endif %}
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
                         </td>
+                        
+                        <!-- P5 -->
                         <td class="purpose-cell">
-                            {% if vendor.p5 == "C, LI" %}
-                                <span class="purpose-both">C, LI</span>
-                            {% elif vendor.p5 == "C" %}
-                                <span class="purpose-c">C</span>
-                            {% elif vendor.p5 == "LI" %}
-                                <span class="purpose-li">LI</span>
+                            {% if vendor.p5 is defined and vendor.p5 %}
+                                {% if vendor.p5 is iterable and vendor.p5 is not string %}
+                                    {% for value in vendor.p5 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">C</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">LI</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif vendor.p5 == "C, LI" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% elif vendor.p5 == "C" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                {% elif vendor.p5 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% else %}
+                                    <span class="purpose-none">-</span>
+                                {% endif %}
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
                         </td>
+                        
+                        <!-- Continue with P6-P10, SP1-SP2, F1-F3, SF1-SF2 following the same pattern -->
+                        <!-- P6 -->
                         <td class="purpose-cell">
-                            {% if vendor.p6 == "C, LI" %}
-                                <span class="purpose-both">C, LI</span>
-                            {% elif vendor.p6 == "C" %}
-                                <span class="purpose-c">C</span>
-                            {% elif vendor.p6 == "LI" %}
-                                <span class="purpose-li">LI</span>
+                            {% if vendor.p6 is defined and vendor.p6 %}
+                                {% if vendor.p6 is iterable and vendor.p6 is not string %}
+                                    {% for value in vendor.p6 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">C</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">LI</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif vendor.p6 == "C, LI" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% elif vendor.p6 == "C" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                {% elif vendor.p6 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% else %}
+                                    <span class="purpose-none">-</span>
+                                {% endif %}
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
                         </td>
+                        
+                        <!-- P7 -->
                         <td class="purpose-cell">
-                            {% if vendor.p7 == "C, LI" %}
-                                <span class="purpose-both">C, LI</span>
-                            {% elif vendor.p7 == "C" %}
-                                <span class="purpose-c">C</span>
-                            {% elif vendor.p7 == "LI" %}
-                                <span class="purpose-li">LI</span>
+                            {% if vendor.p7 is defined and vendor.p7 %}
+                                {% if vendor.p7 is iterable and vendor.p7 is not string %}
+                                    {% for value in vendor.p7 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">C</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">LI</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif vendor.p7 == "C, LI" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% elif vendor.p7 == "C" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                {% elif vendor.p7 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% else %}
+                                    <span class="purpose-none">-</span>
+                                {% endif %}
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
                         </td>
+                        
+                        <!-- P8 -->
                         <td class="purpose-cell">
-                            {% if vendor.p8 == "C, LI" %}
-                                <span class="purpose-both">C, LI</span>
-                            {% elif vendor.p8 == "C" %}
-                                <span class="purpose-c">C</span>
-                            {% elif vendor.p8 == "LI" %}
-                                <span class="purpose-li">LI</span>
+                            {% if vendor.p8 is defined and vendor.p8 %}
+                                {% if vendor.p8 is iterable and vendor.p8 is not string %}
+                                    {% for value in vendor.p8 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">C</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">LI</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif vendor.p8 == "C, LI" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% elif vendor.p8 == "C" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                {% elif vendor.p8 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% else %}
+                                    <span class="purpose-none">-</span>
+                                {% endif %}
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
                         </td>
+                        
+                        <!-- P9 -->
                         <td class="purpose-cell">
-                            {% if vendor.p9 == "C, LI" %}
-                                <span class="purpose-both">C, LI</span>
-                            {% elif vendor.p9 == "C" %}
-                                <span class="purpose-c">C</span>
-                            {% elif vendor.p9 == "LI" %}
-                                <span class="purpose-li">LI</span>
+                            {% if vendor.p9 is defined and vendor.p9 %}
+                                {% if vendor.p9 is iterable and vendor.p9 is not string %}
+                                    {% for value in vendor.p9 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">C</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">LI</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif vendor.p9 == "C, LI" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% elif vendor.p9 == "C" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                {% elif vendor.p9 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% else %}
+                                    <span class="purpose-none">-</span>
+                                {% endif %}
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
                         </td>
+                        
+                        <!-- P10 -->
                         <td class="purpose-cell">
-                            {% if vendor.p10 == "C, LI" %}
-                                <span class="purpose-both">C, LI</span>
-                            {% elif vendor.p10 == "C" %}
-                                <span class="purpose-c">C</span>
-                            {% elif vendor.p10 == "LI" %}
-                                <span class="purpose-li">LI</span>
+                            {% if vendor.p10 is defined and vendor.p10 %}
+                                {% if vendor.p10 is iterable and vendor.p10 is not string %}
+                                    {% for value in vendor.p10 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">C</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">LI</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif vendor.p10 == "C, LI" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% elif vendor.p10 == "C" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                {% elif vendor.p10 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% else %}
+                                    <span class="purpose-none">-</span>
+                                {% endif %}
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
                         </td>
+                        
+                        <!-- SP1 -->
                         <td class="purpose-cell">
-                            {% if vendor.sp1 == "C, LI" %}
-                                <span class="purpose-both">C, LI</span>
-                            {% elif vendor.sp1 == "C" %}
-                                <span class="purpose-c">C</span>
-                            {% elif vendor.sp1 == "LI" %}
-                                <span class="purpose-li">LI</span>
+                            {% if vendor.sp1 is defined and vendor.sp1 %}
+                                {% if vendor.sp1 is iterable and vendor.sp1 is not string %}
+                                    {% for value in vendor.sp1 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">C</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">LI</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif vendor.sp1 == "C, LI" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% elif vendor.sp1 == "C" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                {% elif vendor.sp1 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% else %}
+                                    <span class="purpose-none">-</span>
+                                {% endif %}
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
                         </td>
+                        
+                        <!-- SP2 -->
                         <td class="purpose-cell">
-                            {% if vendor.sp2 == "C, LI" %}
-                                <span class="purpose-both">C, LI</span>
-                            {% elif vendor.sp2 == "C" %}
-                                <span class="purpose-c">C</span>
-                            {% elif vendor.sp2 == "LI" %}
-                                <span class="purpose-li">LI</span>
+                            {% if vendor.sp2 is defined and vendor.sp2 %}
+                                {% if vendor.sp2 is iterable and vendor.sp2 is not string %}
+                                    {% for value in vendor.sp2 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">C</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">LI</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif vendor.sp2 == "C, LI" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% elif vendor.sp2 == "C" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                {% elif vendor.sp2 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% else %}
+                                    <span class="purpose-none">-</span>
+                                {% endif %}
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
                         </td>
+                        
+                        <!-- F1 -->
                         <td class="purpose-cell">
-                            {% if vendor.f1 == "C, LI" %}
-                                <span class="purpose-both">C, LI</span>
-                            {% elif vendor.f1 == "C" %}
-                                <span class="purpose-c">C</span>
-                            {% elif vendor.f1 == "LI" %}
-                                <span class="purpose-li">LI</span>
+                            {% if vendor.f1 is defined and vendor.f1 %}
+                                {% if vendor.f1 is iterable and vendor.f1 is not string %}
+                                    {% for value in vendor.f1 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">C</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">LI</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif vendor.f1 == "C, LI" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% elif vendor.f1 == "C" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                {% elif vendor.f1 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% else %}
+                                    <span class="purpose-none">-</span>
+                                {% endif %}
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
                         </td>
+                        
+                        <!-- F2 -->
                         <td class="purpose-cell">
-                            {% if vendor.f2 == "C, LI" %}
-                                <span class="purpose-both">C, LI</span>
-                            {% elif vendor.f2 == "C" %}
-                                <span class="purpose-c">C</span>
-                            {% elif vendor.f2 == "LI" %}
-                                <span class="purpose-li">LI</span>
+                            {% if vendor.f2 is defined and vendor.f2 %}
+                                {% if vendor.f2 is iterable and vendor.f2 is not string %}
+                                    {% for value in vendor.f2 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">C</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">LI</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif vendor.f2 == "C, LI" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% elif vendor.f2 == "C" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                {% elif vendor.f2 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% else %}
+                                    <span class="purpose-none">-</span>
+                                {% endif %}
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
                         </td>
+                        
+                        <!-- F3 -->
                         <td class="purpose-cell">
-                            {% if vendor.f3 == "C, LI" %}
-                                <span class="purpose-both">C, LI</span>
-                            {% elif vendor.f3 == "C" %}
-                                <span class="purpose-c">C</span>
-                            {% elif vendor.f3 == "LI" %}
-                                <span class="purpose-li">LI</span>
+                            {% if vendor.f3 is defined and vendor.f3 %}
+                                {% if vendor.f3 is iterable and vendor.f3 is not string %}
+                                    {% for value in vendor.f3 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">C</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">LI</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif vendor.f3 == "C, LI" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% elif vendor.f3 == "C" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                {% elif vendor.f3 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% else %}
+                                    <span class="purpose-none">-</span>
+                                {% endif %}
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
                         </td>
+                        
+                        <!-- SF1 -->
                         <td class="purpose-cell">
-                            {% if vendor.sf1 == "C, LI" %}
-                                <span class="purpose-both">C, LI</span>
-                            {% elif vendor.sf1 == "C" %}
-                                <span class="purpose-c">C</span>
-                            {% elif vendor.sf1 == "LI" %}
-                                <span class="purpose-li">LI</span>
+                            {% if vendor.sf1 is defined and vendor.sf1 %}
+                                {% if vendor.sf1 is iterable and vendor.sf1 is not string %}
+                                    {% for value in vendor.sf1 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">C</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">LI</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif vendor.sf1 == "C, LI" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% elif vendor.sf1 == "C" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                {% elif vendor.sf1 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% else %}
+                                    <span class="purpose-none">-</span>
+                                {% endif %}
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
                         </td>
+                        
+                        <!-- SF2 -->
                         <td class="purpose-cell">
-                            {% if vendor.sf2 == "C, LI" %}
-                                <span class="purpose-both">C, LI</span>
-                            {% elif vendor.sf2 == "C" %}
-                                <span class="purpose-c">C</span>
-                            {% elif vendor.sf2 == "LI" %}
-                                <span class="purpose-li">LI</span>
+                            {% if vendor.sf2 is defined and vendor.sf2 %}
+                                {% if vendor.sf2 is iterable and vendor.sf2 is not string %}
+                                    {% for value in vendor.sf2 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">C</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">LI</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif vendor.sf2 == "C, LI" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% elif vendor.sf2 == "C" %}
+                                    <span class="purpose-label purpose-c-label">C</span>
+                                {% elif vendor.sf2 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">LI</span>
+                                {% else %}
+                                    <span class="purpose-none">-</span>
+                                {% endif %}
                             {% else %}
                                 <span class="purpose-none">-</span>
                             {% endif %}
@@ -582,105 +842,5 @@
     
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        // Function to filter the table
-        function filterTable() {
-            var searchInput = document.getElementById("searchInput");
-            var searchFilter = searchInput.value.toUpperCase();
-            var statusFilter = document.getElementById("statusFilter").value;
-            var typeFilter = document.getElementById("typeFilter").value;
-            var mblFilter = document.getElementById("mblFilter").value;
-            var purposeFilter = document.getElementById("purposeFilter").value;
-            var specialPurposeFilter = document.getElementById("specialPurposeFilter").value;
-            var featureFilter = document.getElementById("featureFilter").value;
-            var specialFeatureFilter = document.getElementById("specialFeatureFilter").value;
-            
-            var table = document.getElementById("vendorTable");
-            var tr = table.getElementsByTagName("tr");
-            var visibleCount = 0;
-            
-            // Loop through all table rows, and hide those who don't match the search query
-            for (var i = 1; i < tr.length; i++) { // Start from 1 to skip header row
-                var nameCell = tr[i].getElementsByTagName("td")[1];
-                var statusCell = tr[i].getElementsByTagName("td")[2];
-                var typeCell = tr[i].getElementsByTagName("td")[3];
-                var mblCell = tr[i].getElementsByTagName("td")[4];
-                
-                if (nameCell && statusCell && typeCell && mblCell) {
-                    var nameValue = nameCell.textContent || nameCell.innerText;
-                    var statusTag = statusCell.querySelector(".status-tag");
-                    var statusValue = statusTag ? statusTag.textContent.trim() : "";
-                    var typeTags = typeCell.getElementsByClassName("vendor-type-tag");
-                    var typeValues = [];
-                    
-                    for (var j = 0; j < typeTags.length; j++) {
-                        typeValues.push(typeTags[j].getAttribute("data-type"));
-                    }
-                    
-                    var mblTag = mblCell.querySelector(".mbl-tag");
-                    var mblValue = mblTag ? mblTag.textContent.trim() : "";
-                    
-                    // Check purpose/feature filters
-                    var matchesPurpose = true;
-                    if (purposeFilter !== 'all') {
-                        var purposeIndex = parseInt(purposeFilter.substring(1)) + 4; // p1 is at index 5
-                        var purposeCell = tr[i].getElementsByTagName("td")[purposeIndex];
-                        var purposeIcon = purposeCell.querySelector("i");
-                        matchesPurpose = purposeIcon.classList.contains("purpose-c") || purposeIcon.classList.contains("purpose-li") || purposeIcon.classList.contains("purpose-both");
-                    }
-                    
-                    var matchesSpecialPurpose = true;
-                    if (specialPurposeFilter !== 'all') {
-                        var spIndex = parseInt(specialPurposeFilter.substring(2)) + 14; // sp1 is at index 15
-                        var spCell = tr[i].getElementsByTagName("td")[spIndex];
-                        var spIcon = spCell.querySelector("i");
-                        matchesSpecialPurpose = spIcon.classList.contains("purpose-c") || spIcon.classList.contains("purpose-li") || spIcon.classList.contains("purpose-both");
-                    }
-                    
-                    var matchesFeature = true;
-                    if (featureFilter !== 'all') {
-                        var fIndex = parseInt(featureFilter.substring(1)) + 16; // f1 is at index 17
-                        var fCell = tr[i].getElementsByTagName("td")[fIndex];
-                        var fIcon = fCell.querySelector("i");
-                        matchesFeature = fIcon.classList.contains("purpose-c") || fIcon.classList.contains("purpose-li") || fIcon.classList.contains("purpose-both");
-                    }
-                    
-                    var matchesSpecialFeature = true;
-                    if (specialFeatureFilter !== 'all') {
-                        var sfIndex = parseInt(specialFeatureFilter.substring(2)) + 19; // sf1 is at index 20
-                        var sfCell = tr[i].getElementsByTagName("td")[sfIndex];
-                        var sfIcon = sfCell.querySelector("i");
-                        matchesSpecialFeature = sfIcon.classList.contains("purpose-c") || sfIcon.classList.contains("purpose-li") || sfIcon.classList.contains("purpose-both");
-                    }
-                    
-                    var matchesSearch = nameValue.toUpperCase().indexOf(searchFilter) > -1;
-                    var matchesStatus = statusFilter === 'all' || 
-                                       (statusFilter === 'none' && statusValue === 'None') || 
-                                       statusValue === statusFilter;
-                    var matchesType = typeFilter === 'all' || 
-                                     (typeFilter === 'none' && typeValues.length === 0) || 
-                                     typeValues.includes(typeFilter);
-                    var matchesMBL = mblFilter === 'all' || mblValue === mblFilter;
-                    
-                    if (matchesSearch && matchesStatus && matchesType && matchesMBL && 
-                        matchesPurpose && matchesSpecialPurpose && matchesFeature && matchesSpecialFeature) {
-                        tr[i].style.display = "";
-                        visibleCount++;
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }
-            }
-            
-            // Update the results count
-            document.getElementById("resultsCount").textContent = "Showing " + visibleCount + " of " + (tr.length - 1) + " vendors";
-        }
-        
-        // Initialize the table filter
-        document.addEventListener('DOMContentLoaded', function() {
-            filterTable();
-        });
-    </script>
 </body>
 </html> 

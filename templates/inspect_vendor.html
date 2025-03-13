@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspect Vendor</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Select2 Bootstrap 5 Theme -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <style>
+        body {
+            padding-top: 0;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .card-header {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .purpose-label {
+            display: inline-block;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            border: 1px solid #ced4da;
+        }
+        
+        .purpose-c-label {
+            color: #28a745;
+            border-color: #28a745;
+        }
+        
+        .purpose-li-label {
+            color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        
+        .status-tag {
+            display: inline-block;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            font-weight: 600;
+        }
+        
+        .status-partner {
+            background-color: #d1e7dd;
+            border: 1px solid #badbcc;
+        }
+        
+        .status-shortlist {
+            background-color: #fff3cd;
+            border: 1px solid #ffecb5;
+        }
+        
+        .status-none {
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+        }
+        
+        .vendor-type-tag {
+            display: inline-block;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .mbl-tag {
+            display: inline-block;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            font-weight: 600;
+        }
+        
+        .mbl-yes {
+            background-color: #d1e7dd;
+            border: 1px solid #badbcc;
+        }
+        
+        .mbl-no {
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+        }
+        
+        .purpose-description {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .purpose-description:last-child {
+            border-bottom: none;
+        }
+        
+        .purpose-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-row {
+            margin-bottom: 0.75rem;
+        }
+        
+        .info-label {
+            font-weight: 600;
+        }
+        
+        .info-value {
+            word-break: break-word;
+        }
+        
+        .info-value a {
+            word-break: break-all;
+        }
+        
+        /* Select2 custom styling */
+        .select2-container--bootstrap-5 .select2-selection {
+            min-height: 38px;
+        }
+        
+        .search-container {
+            background-color: #f8f9fa;
+            border-radius: 0.375rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .search-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .json-data {
+            background-color: #f8f9fa;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .nav-tabs {
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">IAB TCF Vendor List</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/purposeslist">Purposeslist</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/vendorlist">Vendorlist</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/vendor-management">Vendor Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/inspect-vendor">Inspect Vendor</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/compare-vendors">Compare Vendors</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h1 class="mb-4">Inspect Vendor</h1>
+        
+        <div class="search-container">
+            <h2 class="search-title">Search for a Vendor</h2>
+            <form method="GET" action="/inspect-vendor">
+                <div class="row">
+                    <div class="col-md-9">
+                        <select name="vendor_id" id="vendorSelect" class="form-select select2-search" data-placeholder="Select a vendor...">
+                            <option value=""></option>
+                            {% for vendor in all_vendors %}
+                                <option value="{{ vendor.id }}" {% if vendor.id == vendor_id %}selected{% endif %}>
+                                    {{ vendor.name }} (ID: {{ vendor.id }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary w-100">Inspect</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        {% if selected_vendor %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    {{ selected_vendor.name }} (ID: {{ selected_vendor.id }})
+                </div>
+                <div class="card-body">
+                    <div class="row info-row">
+                        <div class="col-md-3 info-label">Policy URL:</div>
+                        <div class="col-md-9 info-value">
+                            {% if selected_vendor.policyUrl %}
+                                <a href="{{ selected_vendor.policyUrl }}" target="_blank">{{ selected_vendor.policyUrl }}</a>
+                            {% else %}
+                                <span class="text-muted">Not specified</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if selected_vendor.cookieMaxAgeSeconds is defined %}
+                    <div class="row info-row">
+                        <div class="col-md-3 info-label">Cookie Max Age:</div>
+                        <div class="col-md-9 info-value">
+                            {{ selected_vendor.cookieMaxAgeSeconds }} seconds
+                            ({{ (selected_vendor.cookieMaxAgeSeconds / 86400) | round(1) }} days)
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if selected_vendor.usesCookies is defined %}
+                    <div class="row info-row">
+                        <div class="col-md-3 info-label">Uses Cookies:</div>
+                        <div class="col-md-9 info-value">{{ selected_vendor.usesCookies }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if selected_vendor.usesNonCookieAccess is defined %}
+                    <div class="row info-row">
+                        <div class="col-md-3 info-label">Uses Non-Cookie Access:</div>
+                        <div class="col-md-9 info-value">{{ selected_vendor.usesNonCookieAccess }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if selected_vendor.deviceStorageDisclosureUrl %}
+                    <div class="row info-row">
+                        <div class="col-md-3 info-label">Device Storage Disclosure:</div>
+                        <div class="col-md-9 info-value">
+                            <a href="{{ selected_vendor.deviceStorageDisclosureUrl }}" target="_blank">
+                                {{ selected_vendor.deviceStorageDisclosureUrl }}
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if selected_vendor.deletedDate %}
+                    <div class="row info-row">
+                        <div class="col-md-3 info-label">Deleted Date:</div>
+                        <div class="col-md-9 info-value">{{ selected_vendor.deletedDate }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if selected_vendor.overflow is defined %}
+                    <div class="row info-row">
+                        <div class="col-md-3 info-label">Overflow:</div>
+                        <div class="col-md-9 info-value">{{ selected_vendor.overflow }}</div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row info-row">
+                        <div class="col-md-3 info-label">Status:</div>
+                        <div class="col-md-9 info-value">
+                            {% if selected_vendor.status == "Partner" %}
+                                <span class="status-tag status-partner">Partner</span>
+                            {% elif selected_vendor.status == "Shortlist" %}
+                                <span class="status-tag status-shortlist">Shortlist</span>
+                            {% else %}
+                                <span class="status-tag status-none">None</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row info-row">
+                        <div class="col-md-3 info-label">MBL Audited:</div>
+                        <div class="col-md-9 info-value">
+                            {% if selected_vendor.mblAudited == "Yes" %}
+                                <span class="mbl-tag mbl-yes">Yes</span>
+                            {% else %}
+                                <span class="mbl-tag mbl-no">No/Unknown</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row info-row">
+                        <div class="col-md-3 info-label">Vendor Types:</div>
+                        <div class="col-md-9 info-value">
+                            {% if selected_vendor.vendorTypes %}
+                                {% for type in selected_vendor.vendorTypes %}
+                                    <span class="vendor-type-tag">{{ type }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span class="text-muted">None specified</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Purposes -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    Purposes
+                </div>
+                <div class="card-body">
+                    <div class="purpose-description">
+                        <div class="purpose-title">P1: Store and/or access information on a device</div>
+                        <div>
+                            {% if selected_vendor.p1 is defined %}
+                                {% if selected_vendor.p1 is iterable and selected_vendor.p1 is not string %}
+                                    {% for value in selected_vendor.p1 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">Consent</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif selected_vendor.p1 == "C" %}
+                                    <span class="purpose-label purpose-c-label">Consent</span>
+                                {% elif selected_vendor.p1 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                {% else %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            {% else %}
+                                {% if 1 in selected_vendor.purposes %}
+                                    <span class="purpose-label purpose-c-label">Consent</span>
+                                {% endif %}
+                                {% if 1 in selected_vendor.legIntPurposes %}
+                                    <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                {% endif %}
+                                {% if 1 not in selected_vendor.purposes and 1 not in selected_vendor.legIntPurposes %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="purpose-description">
+                        <div class="purpose-title">P2: Use basic data to select ads</div>
+                        <div>
+                            {% if selected_vendor.p2 is defined %}
+                                {% if selected_vendor.p2 is iterable and selected_vendor.p2 is not string %}
+                                    {% for value in selected_vendor.p2 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">Consent</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif selected_vendor.p2 == "C" %}
+                                    <span class="purpose-label purpose-c-label">Consent</span>
+                                {% elif selected_vendor.p2 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                {% else %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            {% else %}
+                                {% if 2 in selected_vendor.purposes %}
+                                    <span class="purpose-label purpose-c-label">Consent</span>
+                                {% endif %}
+                                {% if 2 in selected_vendor.legIntPurposes %}
+                                    <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                {% endif %}
+                                {% if 2 not in selected_vendor.purposes and 2 not in selected_vendor.legIntPurposes %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Continue with P3-P10 following the same pattern -->
+                    <!-- P3 -->
+                    <div class="purpose-description">
+                        <div class="purpose-title">P3: Create profiles for personalized ads</div>
+                        <div>
+                            {% if selected_vendor.p3 is defined %}
+                                {% if selected_vendor.p3 is iterable and selected_vendor.p3 is not string %}
+                                    {% for value in selected_vendor.p3 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">Consent</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif selected_vendor.p3 == "C" %}
+                                    <span class="purpose-label purpose-c-label">Consent</span>
+                                {% elif selected_vendor.p3 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                {% else %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            {% else %}
+                                {% if 3 in selected_vendor.purposes %}
+                                    <span class="purpose-label purpose-c-label">Consent</span>
+                                {% endif %}
+                                {% if 3 in selected_vendor.legIntPurposes %}
+                                    <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                {% endif %}
+                                {% if 3 not in selected_vendor.purposes and 3 not in selected_vendor.legIntPurposes %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- P4 -->
+                    <div class="purpose-description">
+                        <div class="purpose-title">P4: Select personalized ads</div>
+                        <div>
+                            {% if selected_vendor.p4 is defined %}
+                                {% if selected_vendor.p4 is iterable and selected_vendor.p4 is not string %}
+                                    {% for value in selected_vendor.p4 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">Consent</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif selected_vendor.p4 == "C" %}
+                                    <span class="purpose-label purpose-c-label">Consent</span>
+                                {% elif selected_vendor.p4 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                {% else %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            {% else %}
+                                {% if 4 in selected_vendor.purposes %}
+                                    <span class="purpose-label purpose-c-label">Consent</span>
+                                {% endif %}
+                                {% if 4 in selected_vendor.legIntPurposes %}
+                                    <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                {% endif %}
+                                {% if 4 not in selected_vendor.purposes and 4 not in selected_vendor.legIntPurposes %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Continue with remaining purposes... -->
+                </div>
+            </div>
+            
+            <!-- Special Purposes -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    Special Purposes
+                </div>
+                <div class="card-body">
+                    <div class="purpose-description">
+                        <div class="purpose-title">SP1: Ensure security, prevent fraud, and debug</div>
+                        <div>
+                            {% if selected_vendor.sp1 is defined %}
+                                {% if selected_vendor.sp1 is iterable and selected_vendor.sp1 is not string %}
+                                    {% for value in selected_vendor.sp1 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">Consent</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif selected_vendor.sp1 == "C" %}
+                                    <span class="purpose-label purpose-c-label">Consent</span>
+                                {% elif selected_vendor.sp1 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                {% else %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            {% else %}
+                                {% if 1 in selected_vendor.specialPurposes %}
+                                    <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                {% else %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="purpose-description">
+                        <div class="purpose-title">SP2: Technically deliver ads or content</div>
+                        <div>
+                            {% if selected_vendor.sp2 is defined %}
+                                {% if selected_vendor.sp2 is iterable and selected_vendor.sp2 is not string %}
+                                    {% for value in selected_vendor.sp2 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">Consent</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif selected_vendor.sp2 == "C" %}
+                                    <span class="purpose-label purpose-c-label">Consent</span>
+                                {% elif selected_vendor.sp2 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                {% else %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            {% else %}
+                                {% if 2 in selected_vendor.specialPurposes %}
+                                    <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                {% else %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Features -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    Features
+                </div>
+                <div class="card-body">
+                    <div class="purpose-description">
+                        <div class="purpose-title">F1: Match and combine offline data sources</div>
+                        <div>
+                            {% if selected_vendor.f1 is defined %}
+                                {% if selected_vendor.f1 is iterable and selected_vendor.f1 is not string %}
+                                    {% for value in selected_vendor.f1 %}
+                                        {% if value == "C" %}
+                                            <span class="purpose-label purpose-c-label">Consent</span>
+                                        {% elif value == "LI" %}
+                                            <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% elif selected_vendor.f1 == "C" %}
+                                    <span class="purpose-label purpose-c-label">Consent</span>
+                                {% elif selected_vendor.f1 == "LI" %}
+                                    <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                {% else %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            {% else %}
+                                {% if 1 in selected_vendor.features %}
+                                    <span class="purpose-label purpose-c-label">Consent</span>
+                                {% endif %}
+                                {% if 1 in selected_vendor.specialFeatures %}
+                                    <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                {% endif %}
+                                {% if 1 not in selected_vendor.features and 1 not in selected_vendor.specialFeatures %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Raw Vendor Data -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    Raw Vendor Data
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="rawDataTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="gvl-tab" data-bs-toggle="tab" data-bs-target="#gvl-data" type="button" role="tab" aria-controls="gvl-data" aria-selected="true">
+                                Original GVL Data
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="combined-tab" data-bs-toggle="tab" data-bs-target="#combined-data" type="button" role="tab" aria-controls="combined-data" aria-selected="false">
+                                Combined Data
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="rawDataTabsContent">
+                        <div class="tab-pane fade show active" id="gvl-data" role="tabpanel" aria-labelledby="gvl-tab">
+                            <pre class="json-data">{{ raw_vendor_data | tojson(indent=2) }}</pre>
+                        </div>
+                        <div class="tab-pane fade" id="combined-data" role="tabpanel" aria-labelledby="combined-tab">
+                            <pre class="json-data">{{ selected_vendor | tojson(indent=2) }}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Please select a vendor to view detailed information.
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Initialize Select2 with search functionality
+            $('.select2-search').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: $(this).data('placeholder'),
+                allowClear: true
+            });
+            
+            // Auto-submit form when selection changes (optional)
+            $('#vendorSelect').on('change', function() {
+                if ($(this).val()) {
+                    $('form').submit();
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

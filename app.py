@@ -36,6 +36,27 @@ def save_vendor_data(data):
         print(f"Error saving vendor data: {e}")
         return False
 
+# Function to convert "C, LI" strings to arrays ["C", "LI"]
+def convert_cli_to_arrays():
+    vendor_data = load_vendor_data()
+    updated = False
+    
+    if 'vendors' in vendor_data:
+        for vendor_id, vendor_info in vendor_data['vendors'].items():
+            # Check all purpose fields for "C, LI" values
+            purpose_fields = [f'p{i}' for i in range(1, 11)] + [f'sp{i}' for i in range(1, 3)] + [f'f{i}' for i in range(1, 4)] + [f'sf{i}' for i in range(1, 3)]
+            
+            for field in purpose_fields:
+                if field in vendor_info and vendor_info[field] == "C, LI":
+                    vendor_info[field] = ["C", "LI"]
+                    updated = True
+    
+    if updated:
+        save_vendor_data(vendor_data)
+        print("Updated 'C, LI' values to arrays in vendor_data.json")
+    
+    return vendor_data
+
 # Function to ensure all vendors from GVL are in vendor_data.json with complete data structure
 def ensure_all_vendors_in_data():
     # Load the GVL data
@@ -45,105 +66,71 @@ def ensure_all_vendors_in_data():
     except:
         # If file doesn't exist, fetch it from the IAB
         response = requests.get('https://vendor-list.consensu.org/v3/vendor-list.json')
-        gvl_data = response.json()
-        with open('gvl.json', 'w') as f:
-            json.dump(gvl_data, f)
+        if response.status_code == 200:
+            gvl_data = response.json()
+            # Save the GVL data for future use
+            with open('gvl.json', 'w') as f:
+                json.dump(gvl_data, f, indent=2)
+        else:
+            print("Failed to fetch GVL data")
+            return
     
     # Load current vendor data
     vendor_data = load_vendor_data()
     
-    # Ensure vendors dict exists
+    # Initialize vendors dict if it doesn't exist
     if 'vendors' not in vendor_data:
         vendor_data['vendors'] = {}
     
-    # Add entries for all vendors in GVL with complete data structure
-    updated = False
+    # Ensure all vendors from GVL are in vendor_data.json
     for vendor_id, vendor_info in gvl_data['vendors'].items():
-        # Process purposes according to the new rules
-        purpose_values = {}
-        
-        # Process regular purposes (P1-P10)
-        for i in range(1, 11):
-            purpose_str = str(i)
-            
-            # Check if in flexiblePurposes
-            if 'flexiblePurposes' in vendor_info and purpose_str in map(str, vendor_info['flexiblePurposes']):
-                purpose_values[f'p{i}'] = "C, LI"
-            # Check if in legIntPurposes
-            elif 'legIntPurposes' in vendor_info and purpose_str in map(str, vendor_info['legIntPurposes']):
-                purpose_values[f'p{i}'] = "LI"
-            # Check if in purposes
-            elif 'purposes' in vendor_info and purpose_str in map(str, vendor_info['purposes']):
-                purpose_values[f'p{i}'] = "C"
-            else:
-                purpose_values[f'p{i}'] = "-"
-        
-        # Process special purposes (SP1-SP2)
-        for i in range(1, 3):
-            purpose_str = str(i)
-            
-            # Check if in specialPurposes
-            if 'specialPurposes' in vendor_info and purpose_str in map(str, vendor_info['specialPurposes']):
-                purpose_values[f'sp{i}'] = "LI"
-            else:
-                purpose_values[f'sp{i}'] = "-"
-        
-        # Process features (F1-F3)
-        for i in range(1, 4):
-            feature_str = str(i)
-            
-            # Check if in features
-            if 'features' in vendor_info and feature_str in map(str, vendor_info['features']):
-                purpose_values[f'f{i}'] = "LI"
-            else:
-                purpose_values[f'f{i}'] = "-"
-        
-        # Process special features (SF1-SF2)
-        for i in range(1, 3):
-            feature_str = str(i)
-            
-            # Check if in specialFeatures
-            if 'specialFeatures' in vendor_info and feature_str in map(str, vendor_info['specialFeatures']):
-                purpose_values[f'sf{i}'] = "C"
-            else:
-                purpose_values[f'sf{i}'] = "-"
-        
-        # Create default structure for this vendor
-        default_vendor_data = {
-            'name': vendor_info['name'],
-            'status': '',
-            'mblAudited': 'No/Unknown',
-            'vendorTypes': [],
-            **purpose_values  # Add all the purpose values
-        }
-        
         if vendor_id not in vendor_data['vendors']:
-            # If vendor doesn't exist in our data, add it with default values
-            vendor_data['vendors'][vendor_id] = default_vendor_data
-            updated = True
-        else:
-            # If vendor exists, ensure all fields are present
-            existing_vendor = vendor_data['vendors'][vendor_id]
+            # Add the vendor with default values
+            vendor_data['vendors'][vendor_id] = {
+                'name': vendor_info['name'],
+                'status': '',
+                'mblAudited': 'No/Unknown',
+                'vendorTypes': []
+            }
             
-            # Always update the name from GVL
-            if existing_vendor.get('name') != vendor_info['name']:
-                existing_vendor['name'] = vendor_info['name']
-                updated = True
+            # Add purpose fields
+            for i in range(1, 11):
+                field = f'p{i}'
+                if 'purposes' in vendor_info and i in vendor_info['purposes']:
+                    vendor_data['vendors'][vendor_id][field] = "C"
+                elif 'legIntPurposes' in vendor_info and i in vendor_info['legIntPurposes']:
+                    vendor_data['vendors'][vendor_id][field] = "LI"
+                elif 'flexiblePurposes' in vendor_info and i in vendor_info['flexiblePurposes']:
+                    vendor_data['vendors'][vendor_id][field] = ["C", "LI"]
+                else:
+                    vendor_data['vendors'][vendor_id][field] = ""
             
-            # Update purpose values
-            for key, value in purpose_values.items():
-                existing_vendor[key] = value
-                updated = True
+            # Add special purpose fields
+            for i in range(1, 3):
+                field = f'sp{i}'
+                if 'specialPurposes' in vendor_info and i in vendor_info['specialPurposes']:
+                    vendor_data['vendors'][vendor_id][field] = "LI"
+                else:
+                    vendor_data['vendors'][vendor_id][field] = ""
             
-            # Ensure all fields exist
-            for key, value in default_vendor_data.items():
-                if key not in existing_vendor:
-                    existing_vendor[key] = value
-                    updated = True
+            # Add feature fields
+            for i in range(1, 4):
+                field = f'f{i}'
+                if 'features' in vendor_info and i in vendor_info['features']:
+                    vendor_data['vendors'][vendor_id][field] = "LI"
+                else:
+                    vendor_data['vendors'][vendor_id][field] = ""
+            
+            # Add special feature fields
+            for i in range(1, 3):
+                field = f'sf{i}'
+                if 'specialFeatures' in vendor_info and i in vendor_info['specialFeatures']:
+                    vendor_data['vendors'][vendor_id][field] = "C"
+                else:
+                    vendor_data['vendors'][vendor_id][field] = ""
     
-    # Save if changes were made
-    if updated:
-        save_vendor_data(vendor_data)
+    # Save the updated data
+    save_vendor_data(vendor_data)
     
     return vendor_data
 
@@ -221,8 +208,132 @@ def purposeslist():
 
 @app.route('/vendorlist')
 def vendor_list():
-    vendors = process_vendor_data()
-    return render_template('vendorlist.html', vendors=vendors, update_enabled=True)
+    # Ensure all vendors are in vendor_data.json
+    vendor_data = ensure_all_vendors_in_data()
+    
+    # Convert "C, LI" strings to arrays
+    vendor_data = convert_cli_to_arrays()
+    
+    # Load the GVL data
+    try:
+        with open('gvl.json', 'r') as f:
+            gvl_data = json.load(f)
+    except:
+        gvl_data = {'vendors': {}}
+    
+    # Prepare the vendor list for the template
+    vendors = []
+    for vendor_id, vendor_info in vendor_data['vendors'].items():
+        vendor = {
+            'id': vendor_id,
+            'name': vendor_info.get('name', ''),
+            'status': vendor_info.get('status', ''),
+            'mblAudited': vendor_info.get('mblAudited', 'No/Unknown'),
+            'vendorTypes': vendor_info.get('vendorTypes', []),
+        }
+        
+        # Add purpose fields
+        for i in range(1, 11):
+            field = f'p{i}'
+            vendor[field] = vendor_info.get(field, '')
+        
+        # Add special purpose fields
+        for i in range(1, 3):
+            field = f'sp{i}'
+            vendor[field] = vendor_info.get(field, '')
+        
+        # Add feature fields
+        for i in range(1, 4):
+            field = f'f{i}'
+            vendor[field] = vendor_info.get(field, '')
+        
+        # Add special feature fields
+        for i in range(1, 3):
+            field = f'sf{i}'
+            vendor[field] = vendor_info.get(field, '')
+        
+        vendors.append(vendor)
+    
+    # Sort vendors by ID
+    vendors.sort(key=lambda x: int(x['id']))
+    
+    return render_template('vendorlist.html', vendors=vendors)
+
+@app.route('/inspect-vendor', methods=['GET'])
+def inspect_vendor():
+    # Get vendor ID from query parameter
+    vendor_id = request.args.get('vendor_id', '')
+    
+    # Load vendor data
+    vendor_data = load_vendor_data()
+    
+    # Load GVL data
+    try:
+        with open('gvl.json', 'r') as f:
+            gvl_data = json.load(f)
+    except Exception as e:
+        print(f"Error loading GVL data: {e}")
+        gvl_data = {"vendors": {}}
+    
+    # Prepare list of all vendors for dropdown
+    all_vendors = []
+    for vendor_id_item, vendor_info in gvl_data['vendors'].items():
+        all_vendors.append({
+            'id': vendor_id_item,
+            'name': vendor_info.get('name', f'Vendor {vendor_id_item}')
+        })
+    
+    # Sort vendors by name
+    all_vendors.sort(key=lambda x: x['name'].lower())
+    
+    # Initialize selected vendor
+    selected_vendor = None
+    raw_vendor_data = None
+    
+    # If vendor ID is provided, get its data
+    if vendor_id:
+        # Get vendor data from GVL
+        gvl_vendor = gvl_data.get('vendors', {}).get(vendor_id, {})
+        
+        # Get custom vendor data
+        custom_vendor = vendor_data.get('vendors', {}).get(vendor_id, {})
+        
+        # Store the raw vendor data from GVL
+        if gvl_vendor:
+            raw_vendor_data = gvl_vendor
+            
+            # Combine data
+            selected_vendor = {
+                'id': vendor_id,
+                'name': gvl_vendor.get('name', ''),
+                'policyUrl': gvl_vendor.get('policyUrl', ''),
+                'purposes': gvl_vendor.get('purposes', {}),
+                'legIntPurposes': gvl_vendor.get('legIntPurposes', {}),
+                'specialPurposes': gvl_vendor.get('specialPurposes', {}),
+                'features': gvl_vendor.get('features', {}),
+                'specialFeatures': gvl_vendor.get('specialFeatures', {}),
+                'status': custom_vendor.get('status', ''),
+                'mblAudited': custom_vendor.get('mblAudited', 'No/Unknown'),
+                'vendorTypes': custom_vendor.get('vendorTypes', []),
+                'cookieMaxAgeSeconds': gvl_vendor.get('cookieMaxAgeSeconds', ''),
+                'usesCookies': gvl_vendor.get('usesCookies', ''),
+                'usesNonCookieAccess': gvl_vendor.get('usesNonCookieAccess', ''),
+                'deviceStorageDisclosureUrl': gvl_vendor.get('deviceStorageDisclosureUrl', ''),
+                'deletedDate': gvl_vendor.get('deletedDate', ''),
+                'overflow': gvl_vendor.get('overflow', {})
+            }
+            
+            # Add custom purpose data
+            purpose_fields = [f'p{i}' for i in range(1, 11)] + [f'sp{i}' for i in range(1, 3)] + [f'f{i}' for i in range(1, 4)] + [f'sf{i}' for i in range(1, 3)]
+            for field in purpose_fields:
+                if field in custom_vendor:
+                    selected_vendor[field] = custom_vendor[field]
+    
+    return render_template('inspect_vendor.html', 
+                          all_vendors=all_vendors, 
+                          selected_vendor=selected_vendor,
+                          raw_vendor_data=raw_vendor_data,
+                          vendor_id=vendor_id)
 
 @app.route('/update_vendor', methods=['POST'])
 def update_vendor():
@@ -287,7 +398,98 @@ def update_vendor():
         print(f"Error in update_vendor: {str(e)}")
         return jsonify({'success': False, 'error': str(e)})
 
+@app.route('/compare-vendors', methods=['GET'])
+def compare_vendors():
+    # Get vendor IDs from query parameters
+    vendor_id1 = request.args.get('vendor_id1', '')
+    vendor_id2 = request.args.get('vendor_id2', '')
+    
+    # Load vendor data
+    vendor_data = load_vendor_data()
+    
+    # Load GVL data
+    try:
+        with open('gvl.json', 'r') as f:
+            gvl_data = json.load(f)
+    except Exception as e:
+        print(f"Error loading GVL data: {e}")
+        gvl_data = {"vendors": {}}
+    
+    # Prepare list of all vendors for dropdowns
+    all_vendors = []
+    for vendor_id, vendor_info in gvl_data['vendors'].items():
+        all_vendors.append({
+            'id': vendor_id,
+            'name': vendor_info.get('name', f'Vendor {vendor_id}')
+        })
+    
+    # Sort vendors by name
+    all_vendors.sort(key=lambda x: x['name'].lower())
+    
+    # Initialize selected vendors
+    selected_vendor1 = None
+    selected_vendor2 = None
+    
+    # If vendor IDs are provided, get their data
+    if vendor_id1:
+        selected_vendor1 = get_vendor_details(vendor_id1, gvl_data, vendor_data)
+    
+    if vendor_id2:
+        selected_vendor2 = get_vendor_details(vendor_id2, gvl_data, vendor_data)
+    
+    return render_template('compare_vendors.html', 
+                          all_vendors=all_vendors, 
+                          selected_vendor1=selected_vendor1,
+                          selected_vendor2=selected_vendor2,
+                          vendor_id1=vendor_id1,
+                          vendor_id2=vendor_id2)
+
+# Helper function to get vendor details (reuse this for both inspect-vendor and compare-vendors)
+def get_vendor_details(vendor_id, gvl_data, vendor_data):
+    if not vendor_id:
+        return None
+        
+    # Get vendor data from GVL
+    gvl_vendor = gvl_data.get('vendors', {}).get(vendor_id, {})
+    
+    # Get custom vendor data
+    custom_vendor = vendor_data.get('vendors', {}).get(vendor_id, {})
+    
+    # Combine data
+    if gvl_vendor:
+        selected_vendor = {
+            'id': vendor_id,
+            'name': gvl_vendor.get('name', ''),
+            'policyUrl': gvl_vendor.get('policyUrl', ''),
+            'purposes': gvl_vendor.get('purposes', {}),
+            'legIntPurposes': gvl_vendor.get('legIntPurposes', {}),
+            'specialPurposes': gvl_vendor.get('specialPurposes', {}),
+            'features': gvl_vendor.get('features', {}),
+            'specialFeatures': gvl_vendor.get('specialFeatures', {}),
+            'status': custom_vendor.get('status', ''),
+            'mblAudited': custom_vendor.get('mblAudited', 'No/Unknown'),
+            'vendorTypes': custom_vendor.get('vendorTypes', []),
+            'cookieMaxAgeSeconds': gvl_vendor.get('cookieMaxAgeSeconds', ''),
+            'usesCookies': gvl_vendor.get('usesCookies', ''),
+            'usesNonCookieAccess': gvl_vendor.get('usesNonCookieAccess', ''),
+            'deviceStorageDisclosureUrl': gvl_vendor.get('deviceStorageDisclosureUrl', ''),
+            'deletedDate': gvl_vendor.get('deletedDate', ''),
+            'overflow': gvl_vendor.get('overflow', {})
+        }
+        
+        # Add custom purpose data
+        purpose_fields = [f'p{i}' for i in range(1, 11)] + [f'sp{i}' for i in range(1, 3)] + [f'f{i}' for i in range(1, 4)] + [f'sf{i}' for i in range(1, 3)]
+        for field in purpose_fields:
+            if field in custom_vendor:
+                selected_vendor[field] = custom_vendor[field]
+        
+        return selected_vendor
+    
+    return None
+
 if __name__ == '__main__':
     # Ensure all vendors are in vendor_data.json when app starts
     ensure_all_vendors_in_data()
+    # Convert "C, LI" strings to arrays
+    convert_cli_to_arrays()
     app.run(debug=True)

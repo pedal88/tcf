@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare Vendors</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Select2 Bootstrap 5 Theme -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <style>
+        body {
+            padding-top: 0;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            height: 100%;
+        }
+        
+        .card-header {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .purpose-label {
+            display: inline-block;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            border: 1px solid #ced4da;
+        }
+        
+        .purpose-c-label {
+            color: #28a745;
+            border-color: #28a745;
+        }
+        
+        .purpose-li-label {
+            color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        
+        .status-tag {
+            display: inline-block;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            font-weight: 600;
+        }
+        
+        .status-partner {
+            background-color: #d1e7dd;
+            border: 1px solid #badbcc;
+        }
+        
+        .status-shortlist {
+            background-color: #fff3cd;
+            border: 1px solid #ffecb5;
+        }
+        
+        .status-none {
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+        }
+        
+        .vendor-type-tag {
+            display: inline-block;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .mbl-tag {
+            display: inline-block;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            font-weight: 600;
+        }
+        
+        .mbl-yes {
+            background-color: #d1e7dd;
+            border: 1px solid #badbcc;
+        }
+        
+        .mbl-no {
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+        }
+        
+        .purpose-description {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .purpose-description:last-child {
+            border-bottom: none;
+        }
+        
+        .purpose-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-row {
+            margin-bottom: 0.75rem;
+        }
+        
+        .info-label {
+            font-weight: 600;
+        }
+        
+        .info-value {
+            word-break: break-word;
+        }
+        
+        .info-value a {
+            word-break: break-all;
+        }
+        
+        /* Select2 custom styling */
+        .select2-container--bootstrap-5 .select2-selection {
+            min-height: 38px;
+        }
+        
+        .search-container {
+            background-color: #f8f9fa;
+            border-radius: 0.375rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .search-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .diff-highlight {
+            background-color: #fff3cd;
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+        }
+        
+        .vendor-column {
+            padding: 0 0.75rem;
+        }
+        
+        .compare-row {
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Select2 dropdown improvements */
+        .select2-container--bootstrap-5 .select2-results__option {
+            padding: 0.5rem 0.75rem;
+        }
+        
+        .select2-container--bootstrap-5 .select2-results__option--highlighted {
+            background-color: #0d6efd;
+            color: white;
+        }
+        
+        .select2-container--bootstrap-5 .select2-selection--single {
+            padding: 0.375rem 0.75rem;
+        }
+        
+        .vendor-select-container {
+            margin-bottom: 1rem;
+        }
+        
+        .vendor-select-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">IAB TCF Vendor List</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/purposeslist">Purposeslist</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/vendorlist">Vendorlist</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/vendor-management">Vendor Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/inspect-vendor">Inspect Vendor</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/compare-vendors">Compare Vendors</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h1 class="mb-4">Compare Vendors</h1>
+        
+        <div class="search-container">
+            <div class="search-title">Select Vendors to Compare</div>
+            <form method="GET" action="/compare-vendors">
+                <div class="row">
+                    <div class="col-md-6 vendor-select-container">
+                        <label for="vendor_id1" class="vendor-select-label">Vendor 1:</label>
+                        <select name="vendor_id1" id="vendor_id1" class="form-select select2-search" data-placeholder="Search for a vendor...">
+                            <option value=""></option>
+                            {% for vendor in all_vendors %}
+                                <option value="{{ vendor.id }}" {% if vendor.id == vendor_id1 %}selected{% endif %}>
+                                    {{ vendor.name }} (ID: {{ vendor.id }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 vendor-select-container">
+                        <label for="vendor_id2" class="vendor-select-label">Vendor 2:</label>
+                        <select name="vendor_id2" id="vendor_id2" class="form-select select2-search" data-placeholder="Search for a vendor...">
+                            <option value=""></option>
+                            {% for vendor in all_vendors %}
+                                <option value="{{ vendor.id }}" {% if vendor.id == vendor_id2 %}selected{% endif %}>
+                                    {{ vendor.name }} (ID: {{ vendor.id }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">Compare</button>
+                </div>
+            </form>
+        </div>
+        
+        {% if selected_vendor1 and selected_vendor2 %}
+            <div class="row compare-row">
+                <div class="col-md-6 vendor-column">
+                    <div class="card">
+                        <div class="card-header">
+                            {{ selected_vendor1.name }} (ID: {{ selected_vendor1.id }})
+                        </div>
+                        <div class="card-body">
+                            <div class="section-title">Basic Information</div>
+                            
+                            {% if selected_vendor1.policyUrl %}
+                            <div class="info-row">
+                                <div class="info-label">Policy URL:</div>
+                                <div class="info-value">
+                                    <a href="{{ selected_vendor1.policyUrl }}" target="_blank">
+                                        {{ selected_vendor1.policyUrl }}
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if selected_vendor1.cookieMaxAgeSeconds is defined %}
+                            <div class="info-row">
+                                <div class="info-label">Cookie Max Age:</div>
+                                <div class="info-value {% if selected_vendor1.cookieMaxAgeSeconds != selected_vendor2.cookieMaxAgeSeconds %}diff-highlight{% endif %}">
+                                    {{ selected_vendor1.cookieMaxAgeSeconds }} seconds
+                                    ({% if selected_vendor1.cookieMaxAgeSeconds > 86400 %}
+                                        {{ (selected_vendor1.cookieMaxAgeSeconds / 86400) | round(1) }} days
+                                    {% else %}
+                                        {{ (selected_vendor1.cookieMaxAgeSeconds / 3600) | round(1) }} hours
+                                    {% endif %})
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if selected_vendor1.usesCookies is defined %}
+                            <div class="info-row">
+                                <div class="info-label">Uses Cookies:</div>
+                                <div class="info-value {% if selected_vendor1.usesCookies != selected_vendor2.usesCookies %}diff-highlight{% endif %}">
+                                    {{ selected_vendor1.usesCookies }}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if selected_vendor1.usesNonCookieAccess is defined %}
+                            <div class="info-row">
+                                <div class="info-label">Uses Non-Cookie Access:</div>
+                                <div class="info-value {% if selected_vendor1.usesNonCookieAccess != selected_vendor2.usesNonCookieAccess %}diff-highlight{% endif %}">
+                                    {{ selected_vendor1.usesNonCookieAccess }}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value {% if selected_vendor1.status != selected_vendor2.status %}diff-highlight{% endif %}">
+                                    {% if selected_vendor1.status == "Partner" %}
+                                        <span class="status-tag status-partner">Partner</span>
+                                    {% elif selected_vendor1.status == "Shortlist" %}
+                                        <span class="status-tag status-shortlist">Shortlist</span>
+                                    {% else %}
+                                        <span class="status-tag status-none">None</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="info-row">
+                                <div class="info-label">MBL Audited:</div>
+                                <div class="info-value {% if selected_vendor1.mblAudited != selected_vendor2.mblAudited %}diff-highlight{% endif %}">
+                                    {% if selected_vendor1.mblAudited == "Yes" %}
+                                        <span class="mbl-tag mbl-yes">Yes</span>
+                                    {% else %}
+                                        <span class="mbl-tag mbl-no">No/Unknown</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="info-row">
+                                <div class="info-label">Vendor Types:</div>
+                                <div class="info-value">
+                                    {% if selected_vendor1.vendorTypes %}
+                                        {% for type in selected_vendor1.vendorTypes %}
+                                            <span class="vendor-type-tag">{{ type }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="text-muted">None specified</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 vendor-column">
+                    <div class="card">
+                        <div class="card-header">
+                            {{ selected_vendor2.name }} (ID: {{ selected_vendor2.id }})
+                        </div>
+                        <div class="card-body">
+                            <div class="section-title">Basic Information</div>
+                            
+                            {% if selected_vendor2.policyUrl %}
+                            <div class="info-row">
+                                <div class="info-label">Policy URL:</div>
+                                <div class="info-value">
+                                    <a href="{{ selected_vendor2.policyUrl }}" target="_blank">
+                                        {{ selected_vendor2.policyUrl }}
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if selected_vendor2.cookieMaxAgeSeconds is defined %}
+                            <div class="info-row">
+                                <div class="info-label">Cookie Max Age:</div>
+                                <div class="info-value {% if selected_vendor1.cookieMaxAgeSeconds != selected_vendor2.cookieMaxAgeSeconds %}diff-highlight{% endif %}">
+                                    {{ selected_vendor2.cookieMaxAgeSeconds }} seconds
+                                    ({% if selected_vendor2.cookieMaxAgeSeconds > 86400 %}
+                                        {{ (selected_vendor2.cookieMaxAgeSeconds / 86400) | round(1) }} days
+                                    {% else %}
+                                        {{ (selected_vendor2.cookieMaxAgeSeconds / 3600) | round(1) }} hours
+                                    {% endif %})
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if selected_vendor2.usesCookies is defined %}
+                            <div class="info-row">
+                                <div class="info-label">Uses Cookies:</div>
+                                <div class="info-value {% if selected_vendor1.usesCookies != selected_vendor2.usesCookies %}diff-highlight{% endif %}">
+                                    {{ selected_vendor2.usesCookies }}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if selected_vendor2.usesNonCookieAccess is defined %}
+                            <div class="info-row">
+                                <div class="info-label">Uses Non-Cookie Access:</div>
+                                <div class="info-value {% if selected_vendor1.usesNonCookieAccess != selected_vendor2.usesNonCookieAccess %}diff-highlight{% endif %}">
+                                    {{ selected_vendor2.usesNonCookieAccess }}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="info-row">
+                                <div class="info-label">Status:</div>
+                                <div class="info-value {% if selected_vendor1.status != selected_vendor2.status %}diff-highlight{% endif %}">
+                                    {% if selected_vendor2.status == "Partner" %}
+                                        <span class="status-tag status-partner">Partner</span>
+                                    {% elif selected_vendor2.status == "Shortlist" %}
+                                        <span class="status-tag status-shortlist">Shortlist</span>
+                                    {% else %}
+                                        <span class="status-tag status-none">None</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="info-row">
+                                <div class="info-label">MBL Audited:</div>
+                                <div class="info-value {% if selected_vendor1.mblAudited != selected_vendor2.mblAudited %}diff-highlight{% endif %}">
+                                    {% if selected_vendor2.mblAudited == "Yes" %}
+                                        <span class="mbl-tag mbl-yes">Yes</span>
+                                    {% else %}
+                                        <span class="mbl-tag mbl-no">No/Unknown</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="info-row">
+                                <div class="info-label">Vendor Types:</div>
+                                <div class="info-value">
+                                    {% if selected_vendor2.vendorTypes %}
+                                        {% for type in selected_vendor2.vendorTypes %}
+                                            <span class="vendor-type-tag">{{ type }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="text-muted">None specified</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Purposes Comparison -->
+            <div class="row compare-row">
+                <div class="col-md-6 vendor-column">
+                    <div class="card">
+                        <div class="card-header">Purposes</div>
+                        <div class="card-body">
+                            {% for i in range(1, 11) %}
+                                {% set purpose_key = 'p' ~ i %}
+                                <div class="purpose-description">
+                                    <div class="purpose-title">P{{ i }}: 
+                                        {% if i == 1 %}
+                                            Store and/or access information on a device
+                                        {% elif i == 2 %}
+                                            Select basic ads
+                                        {% elif i == 3 %}
+                                            Create a personalised ads profile
+                                        {% elif i == 4 %}
+                                            Select personalised ads
+                                        {% elif i == 5 %}
+                                            Create a personalised content profile
+                                        {% elif i == 6 %}
+                                            Select personalised content
+                                        {% elif i == 7 %}
+                                            Measure ad performance
+                                        {% elif i == 8 %}
+                                            Measure content performance
+                                        {% elif i == 9 %}
+                                            Apply market research to generate audience insights
+                                        {% elif i == 10 %}
+                                            Develop and improve products
+                                        {% endif %}
+                                    </div>
+                                    <div class="{% if selected_vendor1[purpose_key] != selected_vendor2[purpose_key] %}diff-highlight{% endif %}">
+                                        {% if selected_vendor1[purpose_key] is defined %}
+                                            {% if selected_vendor1[purpose_key] is iterable and selected_vendor1[purpose_key] is not string %}
+                                                {% for value in selected_vendor1[purpose_key] %}
+                                                    {% if value == "C" %}
+                                                        <span class="purpose-label purpose-c-label">Consent</span>
+                                                    {% elif value == "LI" %}
+                                                        <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% elif selected_vendor1[purpose_key] == "C" %}
+                                                <span class="purpose-label purpose-c-label">Consent</span>
+                                            {% elif selected_vendor1[purpose_key] == "LI" %}
+                                                <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                            {% else %}
+                                                <span class="text-muted">Not specified</span>
+                                            {% endif %}
+                                        {% else %}
+                                            {% if i in selected_vendor1.purposes %}
+                                                <span class="purpose-label purpose-c-label">Consent</span>
+                                            {% endif %}
+                                            {% if i in selected_vendor1.legIntPurposes %}
+                                                <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                            {% endif %}
+                                            {% if i not in selected_vendor1.purposes and i not in selected_vendor1.legIntPurposes %}
+                                                <span class="text-muted">Not specified</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 vendor-column">
+                    <div class="card">
+                        <div class="card-header">Purposes</div>
+                        <div class="card-body">
+                            {% for i in range(1, 11) %}
+                                {% set purpose_key = 'p' ~ i %}
+                                <div class="purpose-description">
+                                    <div class="purpose-title">P{{ i }}: 
+                                        {% if i == 1 %}
+                                            Store and/or access information on a device
+                                        {% elif i == 2 %}
+                                            Select basic ads
+                                        {% elif i == 3 %}
+                                            Create a personalised ads profile
+                                        {% elif i == 4 %}
+                                            Select personalised ads
+                                        {% elif i == 5 %}
+                                            Create a personalised content profile
+                                        {% elif i == 6 %}
+                                            Select personalised content
+                                        {% elif i == 7 %}
+                                            Measure ad performance
+                                        {% elif i == 8 %}
+                                            Measure content performance
+                                        {% elif i == 9 %}
+                                            Apply market research to generate audience insights
+                                        {% elif i == 10 %}
+                                            Develop and improve products
+                                        {% endif %}
+                                    </div>
+                                    <div class="{% if selected_vendor1[purpose_key] != selected_vendor2[purpose_key] %}diff-highlight{% endif %}">
+                                        {% if selected_vendor2[purpose_key] is defined %}
+                                            {% if selected_vendor2[purpose_key] is iterable and selected_vendor2[purpose_key] is not string %}
+                                                {% for value in selected_vendor2[purpose_key] %}
+                                                    {% if value == "C" %}
+                                                        <span class="purpose-label purpose-c-label">Consent</span>
+                                                    {% elif value == "LI" %}
+                                                        <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% elif selected_vendor2[purpose_key] == "C" %}
+                                                <span class="purpose-label purpose-c-label">Consent</span>
+                                            {% elif selected_vendor2[purpose_key] == "LI" %}
+                                                <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                            {% else %}
+                                                <span class="text-muted">Not specified</span>
+                                            {% endif %}
+                                        {% else %}
+                                            {% if i in selected_vendor2.purposes %}
+                                                <span class="purpose-label purpose-c-label">Consent</span>
+                                            {% endif %}
+                                            {% if i in selected_vendor2.legIntPurposes %}
+                                                <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                            {% endif %}
+                                            {% if i not in selected_vendor2.purposes and i not in selected_vendor2.legIntPurposes %}
+                                                <span class="text-muted">Not specified</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Special Purposes Comparison -->
+            <div class="row compare-row">
+                <div class="col-md-6 vendor-column">
+                    <div class="card">
+                        <div class="card-header">Special Purposes</div>
+                        <div class="card-body">
+                            {% for i in range(1, 3) %}
+                                {% set purpose_key = 'sp' ~ i %}
+                                <div class="purpose-description">
+                                    <div class="purpose-title">SP{{ i }}: 
+                                        {% if i == 1 %}
+                                            Ensure security
+                                        {% elif i == 2 %}
+                                            Ensure security
+                                        {% elif i == 3 %}
+                                            Ensure security
+                                        {% endif %}
+                                    </div>
+                                    <div class="{% if selected_vendor1[purpose_key] != selected_vendor2[purpose_key] %}diff-highlight{% endif %}">
+                                        {% if selected_vendor1[purpose_key] is defined %}
+                                            {% if selected_vendor1[purpose_key] is iterable and selected_vendor1[purpose_key] is not string %}
+                                                {% for value in selected_vendor1[purpose_key] %}
+                                                    {% if value == "C" %}
+                                                        <span class="purpose-label purpose-c-label">Consent</span>
+                                                    {% elif value == "LI" %}
+                                                        <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% elif selected_vendor1[purpose_key] == "C" %}
+                                                <span class="purpose-label purpose-c-label">Consent</span>
+                                            {% elif selected_vendor1[purpose_key] == "LI" %}
+                                                <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                            {% else %}
+                                                <span class="text-muted">Not specified</span>
+                                            {% endif %}
+                                        {% else %}
+                                            {% if i in selected_vendor1.purposes %}
+                                                <span class="purpose-label purpose-c-label">Consent</span>
+                                            {% endif %}
+                                            {% if i in selected_vendor1.legIntPurposes %}
+                                                <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                            {% endif %}
+                                            {% if i not in selected_vendor1.purposes and i not in selected_vendor1.legIntPurposes %}
+                                                <span class="text-muted">Not specified</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 vendor-column">
+                    <div class="card">
+                        <div class="card-header">Special Purposes</div>
+                        <div class="card-body">
+                            {% for i in range(1, 3) %}
+                                {% set purpose_key = 'sp' ~ i %}
+                                <div class="purpose-description">
+                                    <div class="purpose-title">SP{{ i }}: 
+                                        {% if i == 1 %}
+                                            Ensure security
+                                        {% elif i == 2 %}
+                                            Ensure security
+                                        {% elif i == 3 %}
+                                            Ensure security
+                                        {% endif %}
+                                    </div>
+                                    <div class="{% if selected_vendor2[purpose_key] != selected_vendor1[purpose_key] %}diff-highlight{% endif %}">
+                                        {% if selected_vendor2[purpose_key] is defined %}
+                                            {% if selected_vendor2[purpose_key] is iterable and selected_vendor2[purpose_key] is not string %}
+                                                {% for value in selected_vendor2[purpose_key] %}
+                                                    {% if value == "C" %}
+                                                        <span class="purpose-label purpose-c-label">Consent</span>
+                                                    {% elif value == "LI" %}
+                                                        <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% elif selected_vendor2[purpose_key] == "C" %}
+                                                <span class="purpose-label purpose-c-label">Consent</span>
+                                            {% elif selected_vendor2[purpose_key] == "LI" %}
+                                                <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                            {% else %}
+                                                <span class="text-muted">Not specified</span>
+                                            {% endif %}
+                                        {% else %}
+                                            {% if i in selected_vendor2.purposes %}
+                                                <span class="purpose-label purpose-c-label">Consent</span>
+                                            {% endif %}
+                                            {% if i in selected_vendor2.legIntPurposes %}
+                                                <span class="purpose-label purpose-li-label">Legitimate Interest</span>
+                                            {% endif %}
+                                            {% if i not in selected_vendor2.purposes and i not in selected_vendor2.legIntPurposes %}
+                                                <span class="text-muted">Not specified</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Please select two vendors to compare.
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Initialize Select2 with search functionality
+            $('.select2-search').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: $(this).data('placeholder'),
+                allowClear: true
+            });
+        });
+    </script>
+</body>
+</html> 
