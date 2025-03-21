@@ -1,1125 +1,360 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vendor List</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        /* Custom styling on top of Bootstrap */
-        body {
-            padding-top: 0;
-            background-color: #f8f9fa;
-            font-size: 0.875rem; /* Base font size reduction */
-        }
-        
-        .navbar {
-            margin-bottom: 20px;
-        }
-        
-        /* Clear filters button */
-        .clear-filters-container {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 10px;
-        }
-        
-        .clear-filters-btn {
-            font-size: 0.8rem;
-            padding: 0.25rem 0.75rem;
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 0.25rem;
-            color: #495057;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        
-        .clear-filters-btn:hover {
-            background-color: #e9ecef;
-        }
-        
-        .table-responsive {
-            border-radius: 0.375rem;
-            overflow: hidden;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        }
-        
-        .table {
-            margin-bottom: 0;
-            table-layout: fixed;
-            font-size: 0.8rem; /* Reduced table font size */
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-        
-        /* Subtle grid styling */
-        .table th, .table td {
-            border: 1px solid #e9ecef; /* Light gray grid lines */
-        }
-        
-        .table th {
-            background-color: #f8f9fa;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            font-weight: 600;
-            font-size: 0.75rem; /* Smaller header font */
-            cursor: pointer; /* Show pointer cursor on headers */
-            user-select: none; /* Prevent text selection */
-        }
-        
-        .table th:hover {
-            background-color: #e9ecef; /* Highlight header on hover */
-        }
-        
-        .table th .filter-icon {
-            margin-left: 4px;
-            font-size: 0.7rem;
-            color: #6c757d;
-        }
-        
-        .table th.filtered .filter-icon {
-            color: #0d6efd; /* Blue icon when filter is active */
-        }
-        
-        .filter-dropdown {
-            position: absolute;
-            background-color: white;
-            border: 1px solid #dee2e6;
-            border-radius: 0.25rem;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            padding: 0.5rem;
-            z-index: 1000;
-            min-width: 150px;
-            max-width: 250px;
-            max-height: 300px;
-            overflow-y: auto;
-            display: none;
-        }
-        
-        .filter-dropdown-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #dee2e6;
-        }
-        
-        .filter-dropdown-title {
-            font-weight: 600;
-            font-size: 0.8rem;
-        }
-        
-        .filter-dropdown-close {
-            cursor: pointer;
-            font-size: 0.8rem;
-            color: #6c757d;
-        }
-        
-        .filter-dropdown-close:hover {
-            color: #0d6efd;
-        }
-        
-        .filter-dropdown-search {
-            margin-bottom: 0.5rem;
-        }
-        
-        .filter-dropdown-search input {
-            width: 100%;
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-        }
-        
-        .filter-dropdown-options {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        
-        .filter-dropdown-option {
-            display: flex;
-            align-items: center;
-            padding: 0.25rem 0;
-            font-size: 0.75rem;
-        }
-        
-        .filter-dropdown-option input {
-            margin-right: 0.5rem;
-        }
-        
-        .filter-dropdown-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 0.5rem;
-            padding-top: 0.5rem;
-            border-top: 1px solid #dee2e6;
-        }
-        
-        .filter-dropdown-btn {
-            font-size: 0.7rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 0.25rem;
-            border: 1px solid #ced4da;
-            background-color: #f8f9fa;
-            cursor: pointer;
-        }
-        
-        .filter-dropdown-btn:hover {
-            background-color: #e9ecef;
-        }
-        
-        .filter-dropdown-btn.apply {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
-            color: white;
-        }
-        
-        .filter-dropdown-btn.apply:hover {
-            background-color: #0b5ed7;
-        }
-        
-        .table td, .table th {
-            padding: 0.25rem 0.4rem;
-            vertical-align: middle;
-        }
-        
-        /* Column widths */
-        .table th:nth-child(1), .table td:nth-child(1) { /* ID */
-            width: 40px;
-        }
-        
-        .table th:nth-child(2), .table td:nth-child(2) { /* Vendor */
-            width: 160px;
-        }
-        
-        .table th:nth-child(3), .table td:nth-child(3) { /* Status */
-            width: 80px;
-        }
-        
-        .table th:nth-child(4), .table td:nth-child(4) { /* Vendor Type */
-            width: 180px;
-        }
-        
-        .table th:nth-child(5), .table td:nth-child(5) { /* MBL Audited */
-            width: 80px;
-        }
-        
-        /* Purpose columns - fixed width */
-        .table th:nth-child(n+6), .table td:nth-child(n+6) {
-            width: 50px;
-            max-width: 50px;
-            min-width: 50px;
-            padding: 0.15rem 0.1rem;
-        }
-        
-        /* Vendor name truncation */
-        .table td:nth-child(2) {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        /* Status tag styling */
-        .status-tag {
-            display: inline-flex;
-            align-items: center;
-            border-radius: 0.2rem;
-            padding: 0.1rem 0.15rem;
-            font-size: 0.65rem;
-            font-weight: 700;
-            width: fit-content;
-            line-height: 1;
-        }
-        
-        .status-partner {
-            background-color: #d1e7dd;
-            border: 1px solid #badbcc;
-            color: #0f5132;
-        }
-        
-        .status-shortlist {
-            background-color: #fff3cd;
-            border: 1px solid #ffecb5;
-            color: #664d03;
-        }
-        
-        .status-none {
-            background-color: #f8f9fa;
-            border: 1px solid #ced4da;
-            color: #6c757d;
-        }
-        
-        /* Vendor type tag styling */
-        .vendor-type-tag {
-            display: inline-flex;
-            align-items: center;
-            border-radius: 0.2rem;
-            padding: 0.1rem 0.15rem;
-            margin-right: 0.15rem;
-            margin-bottom: 0.15rem;
-            font-size: 0.65rem;
-            font-weight: 700;
-            background-color: #e9ecef;
-            border: 1px solid #ced4da;
-            color: #495057;
-        }
-        
-        /* MBL Audited tag styling */
-        .mbl-tag {
-            display: inline-flex;
-            align-items: center;
-            border-radius: 0.2rem;
-            padding: 0.1rem 0.15rem;
-            font-size: 0.65rem;
-            font-weight: 700;
-            width: fit-content;
-        }
-        
-        .mbl-yes {
-            background-color: #d1e7dd;
-            border: 1px solid #badbcc;
-            color: #0f5132;
-        }
-        
-        .mbl-no {
-            background-color: #f8f9fa;
-            border: 1px solid #ced4da;
-            color: #6c757d;
-        }
-        
-        /* Purpose styling */
-        .purpose-cell {
-            text-align: center;
-            padding: 0.15rem 0.1rem;
-        }
-        
-        .purpose-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.1rem;
-        }
-        
-        .purpose-label {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.15rem;
-            width: 1.2rem;
-            height: 1.2rem;
-            font-size: 0.6rem;
-            font-weight: 700;
-        }
-        
-        .purpose-c-label {
-            background-color: #cfe2ff;
-            border: 1px solid #9ec5fe;
-            color: #084298;
-        }
-        
-        .purpose-li-label {
-            background-color: #d1e7dd;
-            border: 1px solid #badbcc;
-            color: #0f5132;
-        }
-        
-        .purpose-none {
-            color: #ced4da;
-            font-size: 0.6rem;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Clear Filters Button -->
-        <div class="clear-filters-container">
-            <button id="clearFiltersBtn" class="clear-filters-btn">
-                <i class="bi bi-funnel-fill"></i> Clear All Filters
-            </button>
+{% extends 'base.html' %}
+
+{% block title %}Vendor List - TCF Vendor Manager{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">Vendor List</h1>
+    
+    <div class="alert alert-info mb-4">
+        <i class="bi bi-info-circle"></i> This table shows all vendors and their declared purposes in the TCF Global Vendor List.
+    </div>
+    
+    <!-- Filter Controls -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="bi bi-funnel"></i> Filter Vendors</h5>
         </div>
-        
-        <!-- Table -->
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th data-column="id">ID <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="name">Vendor <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="status">Status <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="vendor-types">Vendor Type <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="mbl-audited">MBL Audited <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="p1">P1 <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="p2">P2 <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="p3">P3 <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="p4">P4 <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="p5">P5 <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="p6">P6 <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="p7">P7 <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="p8">P8 <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="p9">P9 <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="p10">P10 <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="sp1">SP1 <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="sp2">SP2 <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="f1">F1 <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="f2">F2 <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="f3">F3 <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="sf1">SF1 <i class="bi bi-funnel filter-icon"></i></th>
-                        <th data-column="sf2">SF2 <i class="bi bi-funnel filter-icon"></i></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for vendor in vendors %}
-                    {% set normalized_status = vendor.status|title if vendor.status else "None" %}
-                    <tr class="vendor-row" 
-                        data-id="{{ vendor.id }}" 
-                        data-name="{{ vendor.name }}" 
-                        data-status="{{ normalized_status }}"
-                        data-vendor-types="{{ vendor.vendorTypes|join(',') if vendor.vendorTypes else '' }}"
-                        data-mbl-audited="{{ vendor.mblAudited }}"
-                        data-p1="{{ vendor.p1|join(',') if vendor.p1 is iterable and vendor.p1 is not string else vendor.p1|string }}"
-                        data-p2="{{ vendor.p2|join(',') if vendor.p2 is iterable and vendor.p2 is not string else vendor.p2|string }}"
-                        data-p3="{{ vendor.p3|join(',') if vendor.p3 is iterable and vendor.p3 is not string else vendor.p3|string }}"
-                        data-p4="{{ vendor.p4|join(',') if vendor.p4 is iterable and vendor.p4 is not string else vendor.p4|string }}"
-                        data-p5="{{ vendor.p5|join(',') if vendor.p5 is iterable and vendor.p5 is not string else vendor.p5|string }}"
-                        data-p6="{{ vendor.p6|join(',') if vendor.p6 is iterable and vendor.p6 is not string else vendor.p6|string }}"
-                        data-p7="{{ vendor.p7|join(',') if vendor.p7 is iterable and vendor.p7 is not string else vendor.p7|string }}"
-                        data-p8="{{ vendor.p8|join(',') if vendor.p8 is iterable and vendor.p8 is not string else vendor.p8|string }}"
-                        data-p9="{{ vendor.p9|join(',') if vendor.p9 is iterable and vendor.p9 is not string else vendor.p9|string }}"
-                        data-p10="{{ vendor.p10|join(',') if vendor.p10 is iterable and vendor.p10 is not string else vendor.p10|string }}"
-                        data-sp1="{{ vendor.sp1|join(',') if vendor.sp1 is iterable and vendor.sp1 is not string else vendor.sp1|string }}"
-                        data-sp2="{{ vendor.sp2|join(',') if vendor.sp2 is iterable and vendor.sp2 is not string else vendor.sp2|string }}"
-                        data-f1="{{ vendor.f1|join(',') if vendor.f1 is iterable and vendor.f1 is not string else vendor.f1|string }}"
-                        data-f2="{{ vendor.f2|join(',') if vendor.f2 is iterable and vendor.f2 is not string else vendor.f2|string }}"
-                        data-f3="{{ vendor.f3|join(',') if vendor.f3 is iterable and vendor.f3 is not string else vendor.f3|string }}"
-                        data-sf1="{{ vendor.sf1|join(',') if vendor.sf1 is iterable and vendor.sf1 is not string else vendor.sf1|string }}"
-                        data-sf2="{{ vendor.sf2|join(',') if vendor.sf2 is iterable and vendor.sf2 is not string else vendor.sf2|string }}">
-                        <td>{{ vendor.id }}</td>
-                        <td title="{{ vendor.name }}">{{ vendor.name }}</td>
-                        <td>
-                            {% if normalized_status == "Partner" %}
-                                <span class="status-tag status-partner">Partner</span>
-                            {% elif normalized_status == "Shortlist" %}
-                                <span class="status-tag status-shortlist">Shortlist</span>
-                            {% else %}
-                                <span class="status-tag status-none">None</span>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="nameFilter" class="form-label">Vendor Name</label>
+                    <input type="text" class="form-control" id="nameFilter" placeholder="Search by name...">
+                </div>
+                <div class="col-md-3">
+                    <label for="statusFilter" class="form-label">Status</label>
+                    <select class="form-select" id="statusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="Partner">Partner</option>
+                        <option value="Shortlist">Shortlist</option>
+                        <option value="None">None</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="typeFilter" class="form-label">Vendor Type</label>
+                    <select class="form-select" id="typeFilter">
+                        <option value="">All Types</option>
+                        <option value="Advertiser">Advertiser</option>
+                        <option value="Agency">Agency</option>
+                        <option value="DSP">DSP</option>
+                        <option value="SSP">SSP</option>
+                        <option value="Ad Network">Ad Network</option>
+                        <option value="Data Provider">Data Provider</option>
+                        <option value="DMP">DMP</option>
+                        <option value="Analytics Provider">Analytics Provider</option>
+                        <option value="Verification Provider">Verification Provider</option>
+                        <option value="Consent Management Platform">Consent Management Platform</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="mblFilter" class="form-label">MBL Audited</label>
+                    <select class="form-select" id="mblFilter">
+                        <option value="">All</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+                <div class="col-12 mt-3 text-end">
+                    <button id="resetFilters" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Reset Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover" id="vendor-table">
+            <thead>
+                <tr>
+                    <th class="align-middle">ID <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">Vendor <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">Status <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">Vendor Type <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">MBL Audited <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">P1 <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">P2 <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">P3 <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">P4 <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">P5 <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">P6 <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">P7 <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">P8 <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">P9 <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">P10 <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">SP1 <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">SP2 <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">F1 <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">F2 <i class="bi bi-sort-down"></i></th>
+                    <th class="align-middle">F3 <i class="bi bi-sort-down"></i></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vendor in vendors %}
+                <tr>
+                    <td>{{ vendor.id }}</td>
+                    <td>
+                        <a href="{{ url_for('inspect_vendor', vendor_id=vendor.id) }}">{{ vendor.name }}</a>
+                    </td>
+                    <td>
+                        {% if vendor.status == 'Partner' %}
+                            <span class="badge bg-success">Partner</span>
+                        {% elif vendor.status == 'Shortlist' %}
+                            <span class="badge bg-warning text-dark">Shortlist</span>
+                        {% else %}
+                            <span class="badge bg-secondary">None</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if vendor.vendorTypes %}
+                            {% for type in vendor.vendorTypes %}
+                                <span class="badge bg-info">{{ type }}</span>
+                            {% endfor %}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if vendor.mblAudited == 'Yes' %}
+                            <span class="badge bg-success">Yes</span>
+                        {% else %}
+                            <span class="badge bg-light text-dark">No</span>
+                        {% endif %}
+                    </td>
+                    
+                    <!-- TCF Purposes -->
+                    {% for i in range(1, 11) %}
+                        <td class="text-center">
+                            {% if vendor.purposes and i in vendor.purposes %}
+                                <span class="purpose-badge consent">C</span>
                             {% endif %}
-                        </td>
-                        <td>
-                            {% if vendor.vendorTypes %}
-                                {% for type in vendor.vendorTypes %}
-                                    <span class="vendor-type-tag">{{ type }}</span>
-                                {% endfor %}
-                            {% else %}
-                                <span class="text-muted">-</span>
+                            
+                            {% if vendor.legIntPurposes and i in vendor.legIntPurposes and i != 1 %}
+                                <span class="purpose-badge legint">LI</span>
                             {% endif %}
-                        </td>
-                        <td>
-                            {% if vendor.mblAudited == "Yes" %}
-                                <span class="mbl-tag mbl-yes">Yes</span>
-                            {% else %}
-                                <span class="mbl-tag mbl-no">No</span>
-                            {% endif %}
-                        </td>
-                        
-                        <!-- P1 -->
-                        <td class="purpose-cell">
-                            <div class="purpose-container">
-                            {% if vendor.p1 is defined and vendor.p1 %}
-                                {% if vendor.p1 is iterable and vendor.p1 is not string %}
-                                    {% for value in vendor.p1 %}
-                                        {% if value == "C" %}
-                                            <span class="purpose-label purpose-c-label">C</span>
-                                        {% elif value == "LI" %}
-                                            <span class="purpose-label purpose-li-label">LI</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif vendor.p1 == "C, LI" or vendor.p1 == "C,LI" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% elif vendor.p1 == "C" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                {% elif vendor.p1 == "LI" %}
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% else %}
-                                    <span class="purpose-none">-</span>
+                            
+                            {% if vendor.flexiblePurposes and i in vendor.flexiblePurposes %}
+                                {% if i not in vendor.purposes %}
+                                    <span class="purpose-badge consent">C</span>
                                 {% endif %}
-                            {% else %}
-                                <span class="purpose-none">-</span>
-                            {% endif %}
-                            </div>
-                        </td>
-                        
-                        <!-- P2 -->
-                        <td class="purpose-cell">
-                            <div class="purpose-container">
-                            {% if vendor.p2 is defined and vendor.p2 %}
-                                {% if vendor.p2 is iterable and vendor.p2 is not string %}
-                                    {% for value in vendor.p2 %}
-                                        {% if value == "C" %}
-                                            <span class="purpose-label purpose-c-label">C</span>
-                                        {% elif value == "LI" %}
-                                            <span class="purpose-label purpose-li-label">LI</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif vendor.p2 == "C, LI" or vendor.p2 == "C,LI" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% elif vendor.p2 == "C" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                {% elif vendor.p2 == "LI" %}
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% else %}
-                                    <span class="purpose-none">-</span>
+                                {% if i != 1 and i not in vendor.legIntPurposes %}
+                                    <span class="purpose-badge legint">LI</span>
                                 {% endif %}
-                            {% else %}
-                                <span class="purpose-none">-</span>
                             {% endif %}
-                            </div>
                         </td>
-                        
-                        <!-- P3 -->
-                        <td class="purpose-cell">
-                            <div class="purpose-container">
-                            {% if vendor.p3 is defined and vendor.p3 %}
-                                {% if vendor.p3 is iterable and vendor.p3 is not string %}
-                                    {% for value in vendor.p3 %}
-                                        {% if value == "C" %}
-                                            <span class="purpose-label purpose-c-label">C</span>
-                                        {% elif value == "LI" %}
-                                            <span class="purpose-label purpose-li-label">LI</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif vendor.p3 == "C, LI" or vendor.p3 == "C,LI" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% elif vendor.p3 == "C" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                {% elif vendor.p3 == "LI" %}
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% else %}
-                                    <span class="purpose-none">-</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="purpose-none">-</span>
-                            {% endif %}
-                            </div>
-                        </td>
-                        
-                        <!-- P4 -->
-                        <td class="purpose-cell">
-                            <div class="purpose-container">
-                            {% if vendor.p4 is defined and vendor.p4 %}
-                                {% if vendor.p4 is iterable and vendor.p4 is not string %}
-                                    {% for value in vendor.p4 %}
-                                        {% if value == "C" %}
-                                            <span class="purpose-label purpose-c-label">C</span>
-                                        {% elif value == "LI" %}
-                                            <span class="purpose-label purpose-li-label">LI</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif vendor.p4 == "C, LI" or vendor.p4 == "C,LI" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% elif vendor.p4 == "C" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                {% elif vendor.p4 == "LI" %}
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% else %}
-                                    <span class="purpose-none">-</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="purpose-none">-</span>
-                            {% endif %}
-                            </div>
-                        </td>
-                        
-                        <!-- P5 -->
-                        <td class="purpose-cell">
-                            <div class="purpose-container">
-                            {% if vendor.p5 is defined and vendor.p5 %}
-                                {% if vendor.p5 is iterable and vendor.p5 is not string %}
-                                    {% for value in vendor.p5 %}
-                                        {% if value == "C" %}
-                                            <span class="purpose-label purpose-c-label">C</span>
-                                        {% elif value == "LI" %}
-                                            <span class="purpose-label purpose-li-label">LI</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif vendor.p5 == "C, LI" or vendor.p5 == "C,LI" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% elif vendor.p5 == "C" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                {% elif vendor.p5 == "LI" %}
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% else %}
-                                    <span class="purpose-none">-</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="purpose-none">-</span>
-                            {% endif %}
-                            </div>
-                        </td>
-                        
-                        <!-- P6 -->
-                        <td class="purpose-cell">
-                            <div class="purpose-container">
-                            {% if vendor.p6 is defined and vendor.p6 %}
-                                {% if vendor.p6 is iterable and vendor.p6 is not string %}
-                                    {% for value in vendor.p6 %}
-                                        {% if value == "C" %}
-                                            <span class="purpose-label purpose-c-label">C</span>
-                                        {% elif value == "LI" %}
-                                            <span class="purpose-label purpose-li-label">LI</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif vendor.p6 == "C, LI" or vendor.p6 == "C,LI" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% elif vendor.p6 == "C" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                {% elif vendor.p6 == "LI" %}
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% else %}
-                                    <span class="purpose-none">-</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="purpose-none">-</span>
-                            {% endif %}
-                            </div>
-                        </td>
-                        
-                        <!-- P7 -->
-                        <td class="purpose-cell">
-                            <div class="purpose-container">
-                            {% if vendor.p7 is defined and vendor.p7 %}
-                                {% if vendor.p7 is iterable and vendor.p7 is not string %}
-                                    {% for value in vendor.p7 %}
-                                        {% if value == "C" %}
-                                            <span class="purpose-label purpose-c-label">C</span>
-                                        {% elif value == "LI" %}
-                                            <span class="purpose-label purpose-li-label">LI</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif vendor.p7 == "C, LI" or vendor.p7 == "C,LI" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% elif vendor.p7 == "C" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                {% elif vendor.p7 == "LI" %}
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% else %}
-                                    <span class="purpose-none">-</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="purpose-none">-</span>
-                            {% endif %}
-                            </div>
-                        </td>
-                        
-                        <!-- P8 -->
-                        <td class="purpose-cell">
-                            <div class="purpose-container">
-                            {% if vendor.p8 is defined and vendor.p8 %}
-                                {% if vendor.p8 is iterable and vendor.p8 is not string %}
-                                    {% for value in vendor.p8 %}
-                                        {% if value == "C" %}
-                                            <span class="purpose-label purpose-c-label">C</span>
-                                        {% elif value == "LI" %}
-                                            <span class="purpose-label purpose-li-label">LI</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif vendor.p8 == "C, LI" or vendor.p8 == "C,LI" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% elif vendor.p8 == "C" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                {% elif vendor.p8 == "LI" %}
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% else %}
-                                    <span class="purpose-none">-</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="purpose-none">-</span>
-                            {% endif %}
-                            </div>
-                        </td>
-                        
-                        <!-- P9 -->
-                        <td class="purpose-cell">
-                            <div class="purpose-container">
-                            {% if vendor.p9 is defined and vendor.p9 %}
-                                {% if vendor.p9 is iterable and vendor.p9 is not string %}
-                                    {% for value in vendor.p9 %}
-                                        {% if value == "C" %}
-                                            <span class="purpose-label purpose-c-label">C</span>
-                                        {% elif value == "LI" %}
-                                            <span class="purpose-label purpose-li-label">LI</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif vendor.p9 == "C, LI" or vendor.p9 == "C,LI" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% elif vendor.p9 == "C" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                {% elif vendor.p9 == "LI" %}
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% else %}
-                                    <span class="purpose-none">-</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="purpose-none">-</span>
-                            {% endif %}
-                            </div>
-                        </td>
-                        
-                        <!-- P10 -->
-                        <td class="purpose-cell">
-                            <div class="purpose-container">
-                            {% if vendor.p10 is defined and vendor.p10 %}
-                                {% if vendor.p10 is iterable and vendor.p10 is not string %}
-                                    {% for value in vendor.p10 %}
-                                        {% if value == "C" %}
-                                            <span class="purpose-label purpose-c-label">C</span>
-                                        {% elif value == "LI" %}
-                                            <span class="purpose-label purpose-li-label">LI</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif vendor.p10 == "C, LI" or vendor.p10 == "C,LI" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% elif vendor.p10 == "C" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                {% elif vendor.p10 == "LI" %}
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% else %}
-                                    <span class="purpose-none">-</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="purpose-none">-</span>
-                            {% endif %}
-                            </div>
-                        </td>
-                        
-                        <!-- SP1 -->
-                        <td class="purpose-cell">
-                            <div class="purpose-container">
-                            {% if vendor.sp1 is defined and vendor.sp1 %}
-                                {% if vendor.sp1 is iterable and vendor.sp1 is not string %}
-                                    {% for value in vendor.sp1 %}
-                                        {% if value == "C" %}
-                                            <span class="purpose-label purpose-c-label">C</span>
-                                        {% elif value == "LI" %}
-                                            <span class="purpose-label purpose-li-label">LI</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif vendor.sp1 == "C, LI" or vendor.sp1 == "C,LI" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% elif vendor.sp1 == "C" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                {% elif vendor.sp1 == "LI" %}
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% else %}
-                                    <span class="purpose-none">-</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="purpose-none">-</span>
-                            {% endif %}
-                            </div>
-                        </td>
-                        
-                        <!-- SP2 -->
-                        <td class="purpose-cell">
-                            <div class="purpose-container">
-                            {% if vendor.sp2 is defined and vendor.sp2 %}
-                                {% if vendor.sp2 is iterable and vendor.sp2 is not string %}
-                                    {% for value in vendor.sp2 %}
-                                        {% if value == "C" %}
-                                            <span class="purpose-label purpose-c-label">C</span>
-                                        {% elif value == "LI" %}
-                                            <span class="purpose-label purpose-li-label">LI</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif vendor.sp2 == "C, LI" or vendor.sp2 == "C,LI" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% elif vendor.sp2 == "C" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                {% elif vendor.sp2 == "LI" %}
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% else %}
-                                    <span class="purpose-none">-</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="purpose-none">-</span>
-                            {% endif %}
-                            </div>
-                        </td>
-                        
-                        <!-- F1 -->
-                        <td class="purpose-cell">
-                            <div class="purpose-container">
-                            {% if vendor.f1 is defined and vendor.f1 %}
-                                {% if vendor.f1 is iterable and vendor.f1 is not string %}
-                                    {% for value in vendor.f1 %}
-                                        {% if value == "C" %}
-                                            <span class="purpose-label purpose-c-label">C</span>
-                                        {% elif value == "LI" %}
-                                            <span class="purpose-label purpose-li-label">LI</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif vendor.f1 == "C, LI" or vendor.f1 == "C,LI" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% elif vendor.f1 == "C" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                {% elif vendor.f1 == "LI" %}
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% else %}
-                                    <span class="purpose-none">-</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="purpose-none">-</span>
-                            {% endif %}
-                            </div>
-                        </td>
-                        
-                        <!-- F2 -->
-                        <td class="purpose-cell">
-                            <div class="purpose-container">
-                            {% if vendor.f2 is defined and vendor.f2 %}
-                                {% if vendor.f2 is iterable and vendor.f2 is not string %}
-                                    {% for value in vendor.f2 %}
-                                        {% if value == "C" %}
-                                            <span class="purpose-label purpose-c-label">C</span>
-                                        {% elif value == "LI" %}
-                                            <span class="purpose-label purpose-li-label">LI</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif vendor.f2 == "C, LI" or vendor.f2 == "C,LI" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% elif vendor.f2 == "C" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                {% elif vendor.f2 == "LI" %}
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% else %}
-                                    <span class="purpose-none">-</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="purpose-none">-</span>
-                            {% endif %}
-                            </div>
-                        </td>
-                        
-                        <!-- F3 -->
-                        <td class="purpose-cell">
-                            <div class="purpose-container">
-                            {% if vendor.f3 is defined and vendor.f3 %}
-                                {% if vendor.f3 is iterable and vendor.f3 is not string %}
-                                    {% for value in vendor.f3 %}
-                                        {% if value == "C" %}
-                                            <span class="purpose-label purpose-c-label">C</span>
-                                        {% elif value == "LI" %}
-                                            <span class="purpose-label purpose-li-label">LI</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif vendor.f3 == "C, LI" or vendor.f3 == "C,LI" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% elif vendor.f3 == "C" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                {% elif vendor.f3 == "LI" %}
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% else %}
-                                    <span class="purpose-none">-</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="purpose-none">-</span>
-                            {% endif %}
-                            </div>
-                        </td>
-                        
-                        <!-- SF1 -->
-                        <td class="purpose-cell">
-                            <div class="purpose-container">
-                            {% if vendor.sf1 is defined and vendor.sf1 %}
-                                {% if vendor.sf1 is iterable and vendor.sf1 is not string %}
-                                    {% for value in vendor.sf1 %}
-                                        {% if value == "C" %}
-                                            <span class="purpose-label purpose-c-label">C</span>
-                                        {% elif value == "LI" %}
-                                            <span class="purpose-label purpose-li-label">LI</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif vendor.sf1 == "C, LI" or vendor.sf1 == "C,LI" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% elif vendor.sf1 == "C" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                {% elif vendor.sf1 == "LI" %}
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% else %}
-                                    <span class="purpose-none">-</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="purpose-none">-</span>
-                            {% endif %}
-                            </div>
-                        </td>
-                        
-                        <!-- SF2 -->
-                        <td class="purpose-cell">
-                            <div class="purpose-container">
-                            {% if vendor.sf2 is defined and vendor.sf2 %}
-                                {% if vendor.sf2 is iterable and vendor.sf2 is not string %}
-                                    {% for value in vendor.sf2 %}
-                                        {% if value == "C" %}
-                                            <span class="purpose-label purpose-c-label">C</span>
-                                        {% elif value == "LI" %}
-                                            <span class="purpose-label purpose-li-label">LI</span>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% elif vendor.sf2 == "C, LI" or vendor.sf2 == "C,LI" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% elif vendor.sf2 == "C" %}
-                                    <span class="purpose-label purpose-c-label">C</span>
-                                {% elif vendor.sf2 == "LI" %}
-                                    <span class="purpose-label purpose-li-label">LI</span>
-                                {% else %}
-                                    <span class="purpose-none">-</span>
-                                {% endif %}
-                            {% else %}
-                                <span class="purpose-none">-</span>
-                            {% endif %}
-                            </div>
-                        </td>
-                    </tr>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    
+                    <!-- Special Purposes -->
+                    {% for i in range(1, 3) %}
+                        <td class="text-center">
+                            {% if vendor.specialPurposes and i in vendor.specialPurposes %}
+                                <span class="purpose-badge legint">LI</span>
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                    
+                    <!-- Features -->
+                    {% for i in range(1, 4) %}
+                        <td class="text-center">
+                            {% if vendor.features and i in vendor.features %}
+                                <span class="purpose-badge legint">LI</span>
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    
-    <!-- Filter Dropdown Template (hidden) -->
-    <div class="filter-dropdown" id="filterDropdownTemplate">
-        <div class="filter-dropdown-header">
-            <div class="filter-dropdown-title">Filter</div>
-            <div class="filter-dropdown-close"><i class="bi bi-x"></i></div>
-        </div>
-        <div class="filter-dropdown-search">
-            <input type="text" class="filter-search-input" placeholder="Search...">
-        </div>
-        <div class="filter-dropdown-options">
-            <!-- Options will be populated dynamically -->
-        </div>
-        <div class="filter-dropdown-actions">
-            <button class="filter-dropdown-btn select-all">Select All</button>
-            <button class="filter-dropdown-btn clear-all">Clear All</button>
-            <button class="filter-dropdown-btn apply">Apply</button>
-        </div>
-    </div>
-    
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        $(document).ready(function() {
-            // Store active filters
-            const activeFilters = {};
-            
-            // Handle column header click
-            $('th').on('click', function() {
-                const column = $(this).data('column');
-                const $header = $(this);
-                
-                // Close any open filter dropdowns
-                $('.filter-dropdown').not('#filterDropdownTemplate').remove();
-                
-                // Create a new filter dropdown
-                const $dropdown = $('#filterDropdownTemplate').clone().removeAttr('id').appendTo('body');
-                $dropdown.find('.filter-dropdown-title').text(`Filter: ${$header.text().replace(' ▾', '')}`);
-                
-                // Position the dropdown below the header
-                const headerPos = $header[0].getBoundingClientRect();
-                $dropdown.css({
-                    top: headerPos.bottom + window.scrollY + 'px',
-                    left: headerPos.left + window.scrollX + 'px',
-                    display: 'block'
-                });
-                
-                // Get unique values for this column
-                const values = getUniqueColumnValues(column);
-                
-                // Populate dropdown options
-                populateFilterOptions($dropdown, column, values);
-                
-                // Handle dropdown close
-                $dropdown.find('.filter-dropdown-close').on('click', function() {
-                    $dropdown.remove();
-                });
-                
-                // Handle search input
-                $dropdown.find('.filter-search-input').on('input', function() {
-                    const searchTerm = $(this).val().toLowerCase();
-                    $dropdown.find('.filter-dropdown-option').each(function() {
-                        const optionText = $(this).text().toLowerCase();
-                        $(this).toggle(optionText.includes(searchTerm));
-                    });
-                });
-                
-                // Handle select all button
-                $dropdown.find('.select-all').on('click', function() {
-                    $dropdown.find('.filter-dropdown-option input').prop('checked', true);
-                });
-                
-                // Handle clear all button
-                $dropdown.find('.clear-all').on('click', function() {
-                    $dropdown.find('.filter-dropdown-option input').prop('checked', false);
-                });
-                
-                // Handle apply button
-                $dropdown.find('.apply').on('click', function() {
-                    const selectedValues = [];
-                    $dropdown.find('.filter-dropdown-option input:checked').each(function() {
-                        selectedValues.push($(this).val());
-                    });
-                    
-                    if (selectedValues.length === 0 || selectedValues.length === $dropdown.find('.filter-dropdown-option').length) {
-                        // If nothing is selected or everything is selected, remove the filter
-                        delete activeFilters[column];
-                        $header.removeClass('filtered');
-                    } else {
-                        // Apply the filter
-                        activeFilters[column] = selectedValues;
-                        $header.addClass('filtered');
-                    }
-                    
-                    // Apply all active filters
-                    applyFilters();
-                    
-                    // Close the dropdown
-                    $dropdown.remove();
-                });
-                
-                // Close dropdown when clicking outside
-                $(document).on('click', function(e) {
-                    if (!$(e.target).closest('.filter-dropdown').length && !$(e.target).closest('th').length) {
-                        $('.filter-dropdown').not('#filterDropdownTemplate').remove();
-                    }
-                });
-            });
-            
-            // Clear all filters button
-            $('#clearFiltersBtn').on('click', function() {
-                // Clear all active filters
-                Object.keys(activeFilters).forEach(key => delete activeFilters[key]);
-                
-                // Remove filtered class from headers
-                $('th').removeClass('filtered');
-                
-                // Show all rows
-                $('.vendor-row').show();
-                
-                // Hide the clear filters button if no filters are active
-                $(this).css('visibility', Object.keys(activeFilters).length > 0 ? 'visible' : 'hidden');
-            });
-            
-            // Function to get unique values for a column
-            function getUniqueColumnValues(column) {
-                const values = new Set();
-                
-                $('.vendor-row').each(function() {
-                    let value = $(this).data(column);
-                    
-                    // Handle arrays (like vendor types)
-                    if (typeof value === 'string' && value.includes(',')) {
-                        value.split(',').forEach(v => {
-                            if (v.trim()) values.add(v.trim());
-                        });
-                    } else {
-                        if (value) values.add(value);
-                    }
-                });
-                
-                return Array.from(values).sort();
-            }
-            
-            // Function to populate filter options
-            function populateFilterOptions($dropdown, column, values) {
-                const $optionsContainer = $dropdown.find('.filter-dropdown-options');
-                $optionsContainer.empty();
-                
-                values.forEach(value => {
-                    const isChecked = !activeFilters[column] || activeFilters[column].includes(value);
-                    const $option = $(`
-                        <div class="filter-dropdown-option">
-                            <input type="checkbox" value="${value}" ${isChecked ? 'checked' : ''}>
-                            <label>${value}</label>
-                        </div>
-                    `);
-                    $optionsContainer.append($option);
-                });
-                
-                // If no values, show a message
-                if (values.length === 0) {
-                    $optionsContainer.append('<div class="filter-dropdown-option">No values available</div>');
-                }
-            }
-            
-            // Function to apply all active filters
-            function applyFilters() {
-                $('.vendor-row').each(function() {
-                    const $row = $(this);
-                    let visible = true;
-                    
-                    // Check each active filter
-                    for (const column in activeFilters) {
-                        const allowedValues = activeFilters[column];
-                        let rowValue = $row.data(column);
-                        
-                        // Skip if no filter values
-                        if (!allowedValues || allowedValues.length === 0) continue;
-                        
-                        // Handle array values (like vendor types)
-                        if (typeof rowValue === 'string' && rowValue.includes(',')) {
-                            const rowValues = rowValue.split(',').map(v => v.trim());
-                            // Row passes if ANY of its values are in the allowed values
-                            const passes = rowValues.some(v => allowedValues.includes(v));
-                            if (!passes) {
-                                visible = false;
-                                break;
-                            }
-                        } else {
-                            // Simple value comparison
-                            if (!allowedValues.includes(rowValue)) {
-                                visible = false;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    // Show/hide the row
-                    $row.toggle(visible);
-                });
-                
-                // Show/hide clear filters button based on whether any filters are active
-                $('#clearFiltersBtn').css('visibility', Object.keys(activeFilters).length > 0 ? 'visible' : 'hidden');
-            }
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Initialize DataTable without custom search features
+        var table = $('#vendor-table').DataTable({
+            "paging": true,
+            "ordering": true,
+            "info": true,
+            "pageLength": 25,
+            "scrollX": true,
+            // Don't show built-in search box
+            "dom": 'lrtip'
         });
-    </script>
-</body>
-</html> 
+        
+        // Manual filtering functions that examine cell contents
+        function filterTable() {
+            // Get current filter values
+            var nameFilter = $('#nameFilter').val().toLowerCase();
+            var statusFilter = $('#statusFilter').val();
+            var typeFilter = $('#typeFilter').val();
+            var mblFilter = $('#mblFilter').val();
+            
+            // Check each row against the filters
+            $('#vendor-table tbody tr').each(function() {
+                var row = $(this);
+                var showRow = true;
+                
+                // Get text content from cells
+                var vendorName = row.find('td:eq(1)').text().toLowerCase(); // Vendor name (2nd column)
+                var statusHtml = row.find('td:eq(2)').html(); // Status column HTML
+                var typeHtml = row.find('td:eq(3)').html(); // Vendor Type column HTML
+                var mblHtml = row.find('td:eq(4)').html(); // MBL Audited column HTML
+                
+                // Check name filter (text match)
+                if (nameFilter && vendorName.indexOf(nameFilter) === -1) {
+                    showRow = false;
+                }
+                
+                // Check status filter (contains badge with text)
+                if (statusFilter && statusHtml.indexOf(statusFilter) === -1) {
+                    showRow = false;
+                }
+                
+                // Check vendor type filter (contains badge with text)
+                if (typeFilter && typeHtml.indexOf(typeFilter) === -1) {
+                    showRow = false;
+                }
+                
+                // Check MBL Audited filter (contains badge with text)
+                if (mblFilter && mblHtml.indexOf(mblFilter) === -1) {
+                    showRow = false;
+                }
+                
+                // Show or hide row based on filter result
+                if (showRow) {
+                    row.show();
+                } else {
+                    row.hide();
+                }
+            });
+            
+            // Update DataTables info display
+            updateTableInfo();
+        }
+        
+        // Update table information display (showing X of Y entries)
+        function updateTableInfo() {
+            var totalRows = $('#vendor-table tbody tr').length;
+            var visibleRows = $('#vendor-table tbody tr:visible').length;
+            
+            $('#vendor-table_info').text('Showing ' + visibleRows + ' of ' + totalRows + ' entries' + 
+                (visibleRows < totalRows ? ' (filtered from ' + totalRows + ' total entries)' : ''));
+        }
+        
+        // Apply filters on input change
+        $('#nameFilter').on('keyup', filterTable);
+        $('#statusFilter, #typeFilter, #mblFilter').on('change', filterTable);
+        
+        // Reset all filters and show all rows
+        $('#resetFilters').on('click', function() {
+            // Clear filter inputs
+            $('#nameFilter').val('');
+            $('#statusFilter').val('');
+            $('#typeFilter').val('');
+            $('#mblFilter').val('');
+            
+            // Show all rows
+            $('#vendor-table tbody tr').show();
+            
+            // Update info display
+            updateTableInfo();
+        });
+        
+        // Check if DataTables pagination needs adjustment
+        function adjustPagination() {
+            // If we're filtering, temporarily disable pagination
+            if ($('#vendor-table tbody tr:hidden').length > 0) {
+                table.page.len(-1).draw();
+            } else {
+                table.page.len(25).draw();
+            }
+        }
+        
+        // Add event listeners to filter inputs for immediate response
+        $('#nameFilter, #statusFilter, #typeFilter, #mblFilter').on('input change', function() {
+            filterTable();
+            adjustPagination();
+        });
+    });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .purpose-badge {
+        display: inline-block;
+        width: 25px;
+        height: 25px;
+        border-radius: 4px;
+        line-height: 25px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 0.75rem;
+        margin: 2px;
+    }
+    
+    .consent {
+        background-color: #cfe2ff;
+        color: #0d6efd;
+    }
+    
+    .legint {
+        background-color: #d1e7dd;
+        color: #198754;
+    }
+    
+    th {
+        white-space: nowrap;
+        font-size: 0.9rem;
+    }
+    
+    .table > thead > tr > th {
+        vertical-align: middle;
+        background-color: #f8f9fa;
+    }
+    
+    .bi-sort-down {
+        font-size: 0.7rem;
+        opacity: 0.5;
+    }
+    
+    #vendor-table {
+        font-size: 0.9rem;
+    }
+
+    /* Improve layout of cells with multiple badges */
+    td.text-center {
+        padding: 4px 2px;
+        min-width: 60px;
+    }
+
+    /* Stack badges vertically when needed */
+    @media (max-width: 1200px) {
+        td.text-center {
+            min-width: 40px;
+        }
+        
+        .purpose-badge {
+            display: block;
+            margin: 2px auto;
+        }
+    }
+    
+    /* Filter panel styling */
+    .card-header {
+        padding: 0.75rem 1.25rem;
+    }
+    
+    .card-header h5 {
+        font-size: 1rem;
+        font-weight: 500;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %} 

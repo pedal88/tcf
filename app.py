@@ -5,8 +5,9 @@ import os
 
 app = Flask(__name__)
 
-# Path to the vendor data JSON file
-VENDOR_DATA_FILE = os.path.join(os.path.dirname(__file__), 'vendor_data.json')
+# Update file path references from root directory to data folder
+GVL_FILE_PATH = 'data/gvl.json'  # Updated path
+VENDOR_DATA_FILE_PATH = 'data/vendor_data.json'  # Updated path
 
 # Set this to True to enable updates without password
 ENABLE_UPDATES_WITHOUT_PASSWORD = True
@@ -17,20 +18,19 @@ UPDATE_PASSWORD = os.environ.get('UPDATE_PASSWORD', None)
 
 # Function to load vendor data from JSON file
 def load_vendor_data():
-    if os.path.exists(VENDOR_DATA_FILE):
-        try:
-            with open(VENDOR_DATA_FILE, 'r') as f:
-                return json.load(f)
-        except Exception as e:
-            print(f"Error loading vendor data: {e}")
-            return {"vendors": {}}
-    return {"vendors": {}}
+    try:
+        with open(VENDOR_DATA_FILE_PATH, 'r') as file:
+            return json.load(file)
+    except Exception as e:
+        print(f"Error loading vendor data: {e}")
+        return {}
 
 # Function to save vendor data to JSON file
 def save_vendor_data(data):
+    """Save updated vendor data to the JSON file"""
     try:
-        with open(VENDOR_DATA_FILE, 'w') as f:
-            json.dump(data, f, indent=2)
+        with open(VENDOR_DATA_FILE_PATH, 'w') as file:
+            json.dump(data, file, indent=4)
         return True
     except Exception as e:
         print(f"Error saving vendor data: {e}")
@@ -61,7 +61,7 @@ def convert_cli_to_arrays():
 def ensure_all_vendors_in_data():
     # Load the GVL data
     try:
-        with open('gvl.json', 'r') as f:
+        with open(GVL_FILE_PATH, 'r') as f:
             gvl_data = json.load(f)
     except:
         # If file doesn't exist, fetch it from the IAB
@@ -69,7 +69,7 @@ def ensure_all_vendors_in_data():
         if response.status_code == 200:
             gvl_data = response.json()
             # Save the GVL data for future use
-            with open('gvl.json', 'w') as f:
+            with open(GVL_FILE_PATH, 'w') as f:
                 json.dump(gvl_data, f, indent=2)
         else:
             print("Failed to fetch GVL data")
@@ -141,13 +141,13 @@ def process_vendor_data():
     
     # Load the GVL data
     try:
-        with open('gvl.json', 'r') as f:
+        with open(GVL_FILE_PATH, 'r') as f:
             gvl_data = json.load(f)
     except:
         # If file doesn't exist, fetch it from the IAB
         response = requests.get('https://vendor-list.consensu.org/v3/vendor-list.json')
         gvl_data = response.json()
-        with open('gvl.json', 'w') as f:
+        with open(GVL_FILE_PATH, 'w') as f:
             json.dump(gvl_data, f)
     
     # Process vendor data
@@ -207,55 +207,56 @@ def purposeslist():
     return render_template('purposeslist.html', vendors=vendors, update_enabled=True)
 
 @app.route('/vendorlist')
-def vendor_list():
-    # Ensure all vendors are in vendor_data.json
-    vendor_data = ensure_all_vendors_in_data()
-    
-    # Convert "C, LI" strings to arrays
-    vendor_data = convert_cli_to_arrays()
-    
-    # Load the GVL data
+def vendorlist():
+    # Load GVL data
     try:
-        with open('gvl.json', 'r') as f:
+        with open('data/gvl.json', 'r', encoding='utf-8') as f:
             gvl_data = json.load(f)
-    except:
-        gvl_data = {'vendors': {}}
+    except Exception as e:
+        print(f"Error loading GVL data: {e}")
+        gvl_data = {"vendors": {}}
     
-    # Prepare the vendor list for the template
+    # Load custom vendor data
+    try:
+        with open('data/vendor_data.json', 'r', encoding='utf-8') as f:
+            vendor_data = json.load(f)
+    except Exception as e:
+        print(f"Error loading vendor data: {e}")
+        vendor_data = {}
+    
+    # Combine data
     vendors = []
-    for vendor_id, vendor_info in vendor_data['vendors'].items():
-        vendor = {
-            'id': vendor_id,
-            'name': vendor_info.get('name', ''),
-            'status': vendor_info.get('status', ''),
-            'mblAudited': vendor_info.get('mblAudited', 'No/Unknown'),
-            'vendorTypes': vendor_info.get('vendorTypes', []),
+    for vendor_id, vendor in gvl_data["vendors"].items():
+        vendor_id = int(vendor_id)
+        
+        # Add custom data if available
+        custom_data = vendor_data.get(str(vendor_id), {})
+        
+        # Create combined vendor object
+        combined_vendor = {
+            "id": vendor_id,
+            "name": vendor.get("name", ""),
+            "purposes": vendor.get("purposes", []),
+            "legIntPurposes": vendor.get("legIntPurposes", []),
+            "flexiblePurposes": vendor.get("flexiblePurposes", []),
+            "specialPurposes": vendor.get("specialPurposes", []),
+            "features": vendor.get("features", []),
+            "specialFeatures": vendor.get("specialFeatures", []),
+            "policyUrl": vendor.get("policyUrl", ""),
+            "cookieMaxAgeSeconds": vendor.get("cookieMaxAgeSeconds", ""),
+            "usesCookies": vendor.get("usesCookies", False),
+            "usesNonCookieAccess": vendor.get("usesNonCookieAccess", False),
+            "deviceStorageDisclosureUrl": vendor.get("deviceStorageDisclosureUrl", ""),
+            # Custom data
+            "status": custom_data.get("status", ""),
+            "vendorTypes": custom_data.get("vendorTypes", []),
+            "mblAudited": custom_data.get("mblAudited", "No/Unknown")
         }
         
-        # Add purpose fields
-        for i in range(1, 11):
-            field = f'p{i}'
-            vendor[field] = vendor_info.get(field, '')
-        
-        # Add special purpose fields
-        for i in range(1, 3):
-            field = f'sp{i}'
-            vendor[field] = vendor_info.get(field, '')
-        
-        # Add feature fields
-        for i in range(1, 4):
-            field = f'f{i}'
-            vendor[field] = vendor_info.get(field, '')
-        
-        # Add special feature fields
-        for i in range(1, 3):
-            field = f'sf{i}'
-            vendor[field] = vendor_info.get(field, '')
-        
-        vendors.append(vendor)
+        vendors.append(combined_vendor)
     
     # Sort vendors by ID
-    vendors.sort(key=lambda x: int(x['id']))
+    vendors.sort(key=lambda x: x["id"])
     
     return render_template('vendorlist.html', vendors=vendors)
 
@@ -269,7 +270,7 @@ def inspect_vendor():
     
     # Load GVL data
     try:
-        with open('gvl.json', 'r') as f:
+        with open(GVL_FILE_PATH, 'r') as f:
             gvl_data = json.load(f)
     except Exception as e:
         print(f"Error loading GVL data: {e}")
@@ -329,7 +330,7 @@ def inspect_vendor():
                 if field in custom_vendor:
                     selected_vendor[field] = custom_vendor[field]
     
-    return render_template('inspect_vendor.html', 
+    return render_template('inspect-vendor.html', 
                           all_vendors=all_vendors, 
                           selected_vendor=selected_vendor,
                           raw_vendor_data=raw_vendor_data,
@@ -369,7 +370,7 @@ def update_vendor():
         if vendor_id not in vendor_data['vendors']:
             # Load the GVL data to get the vendor name
             try:
-                with open('gvl.json', 'r') as f:
+                with open(GVL_FILE_PATH, 'r') as f:
                     gvl_data = json.load(f)
                     vendor_name = gvl_data['vendors'][vendor_id]['name']
             except:
@@ -409,7 +410,7 @@ def compare_vendors():
     
     # Load GVL data
     try:
-        with open('gvl.json', 'r') as f:
+        with open(GVL_FILE_PATH, 'r') as f:
             gvl_data = json.load(f)
     except Exception as e:
         print(f"Error loading GVL data: {e}")
@@ -437,7 +438,7 @@ def compare_vendors():
     if vendor_id2:
         selected_vendor2 = get_vendor_details(vendor_id2, gvl_data, vendor_data)
     
-    return render_template('compare_vendors.html', 
+    return render_template('compare-vendors.html', 
                           all_vendors=all_vendors, 
                           selected_vendor1=selected_vendor1,
                           selected_vendor2=selected_vendor2,

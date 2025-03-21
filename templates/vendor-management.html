@@ -1,861 +1,391 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vendor Management</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        /* Custom styling on top of Bootstrap */
-        body {
-            padding-top: 0;
-            background-color: #f8f9fa;
-            font-size: 0.875rem; /* Base font size reduction */
-        }
+{% extends 'base.html' %}
+
+{% block title %}Vendor Management - TCF Vendor Manager{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="mb-4">Vendor Management</h1>
         
-        .navbar {
-            margin-bottom: 20px;
-        }
-        
-        .table-responsive {
-            border-radius: 0.375rem;
-            overflow: hidden;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        }
-        
-        .table {
-            margin-bottom: 0;
-            table-layout: fixed;
-            font-size: 0.8rem; /* Reduced table font size */
-        }
-        
-        .table th {
-            background-color: #f8f9fa;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            font-weight: 600;
-            font-size: 0.75rem; /* Smaller header font */
-        }
-        
-        .table td, .table th {
-            padding: 0.25rem 0.4rem;
-            vertical-align: middle;
-        }
-        
-        /* Column widths */
-        .table th:nth-child(1), .table td:nth-child(1) { /* ID */
-            width: 40px;
-        }
-        
-        .table th:nth-child(2), .table td:nth-child(2) { /* Vendor */
-            width: 160px;
-        }
-        
-        .table th:nth-child(3), .table td:nth-child(3) { /* Status */
-            width: 100px;
-        }
-        
-        .table th:nth-child(4), .table td:nth-child(4) { /* Vendor Type */
-            width: 220px;
-        }
-        
-        .table th:nth-child(5), .table td:nth-child(5) { /* MBL Audited */
-            width: 100px;
-        }
-        
-        /* Vendor name truncation */
-        .table td:nth-child(2) {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        /* Status tag styling */
-        .status-container {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        
-        .status-tag {
-            display: inline-flex;
-            align-items: center;
-            border-radius: 0.25rem;
-            padding: 0.125rem 0.375rem;
-            font-size: 0.7rem;
-            font-weight: 600;
-            width: fit-content;
-        }
-        
-        .status-partner {
-            background-color: #d1e7dd;
-            border: 1px solid #badbcc;
-        }
-        
-        .status-shortlist {
-            background-color: #fff3cd;
-            border: 1px solid #ffecb5;
-        }
-        
-        .status-none {
-            background-color: #f8f9fa;
-            border: 1px solid #ced4da;
-        }
-        
-        .remove-status {
-            margin-left: 0.25rem;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        
-        .status-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        
-        .select-status-button {
-            background-color: #f8f9fa;
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-            padding: 0.125rem 0.375rem;
-            font-size: 0.7rem;
-            cursor: pointer;
-        }
-        
-        .status-dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #fff;
-            min-width: 120px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-            border-radius: 0.25rem;
-            overflow: hidden;
-        }
-        
-        .status-option {
-            padding: 0.375rem 0.75rem;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-        
-        .status-option:hover {
-            background-color: #f8f9fa;
-        }
-        
-        /* MBL Audited styling */
-        .mbl-container {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        
-        .mbl-tag {
-            display: inline-flex;
-            align-items: center;
-            border-radius: 0.25rem;
-            padding: 0.125rem 0.375rem;
-            font-size: 0.7rem;
-            font-weight: 600;
-            width: fit-content;
-        }
-        
-        .mbl-yes {
-            background-color: #d1e7dd;
-            border: 1px solid #badbcc;
-        }
-        
-        .mbl-no {
-            background-color: #f8f9fa;
-            border: 1px solid #ced4da;
-        }
-        
-        .remove-mbl {
-            margin-left: 0.25rem;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        
-        .mbl-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        
-        .select-mbl-button {
-            background-color: #f8f9fa;
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-            padding: 0.125rem 0.375rem;
-            font-size: 0.7rem;
-            cursor: pointer;
-        }
-        
-        .mbl-dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #fff;
-            min-width: 120px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-            border-radius: 0.25rem;
-            overflow: hidden;
-        }
-        
-        .mbl-option {
-            padding: 0.375rem 0.75rem;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-        
-        .mbl-option:hover {
-            background-color: #f8f9fa;
-        }
-        
-        /* Vendor type styling */
-        .vendor-type-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.25rem;
-            margin-bottom: 0.25rem;
-        }
-        
-        .vendor-type-tag {
-            display: inline-flex;
-            align-items: center;
-            background-color: #e9ecef;
-            border-radius: 0.25rem;
-            padding: 0.125rem 0.375rem;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-        
-        .remove-type {
-            margin-left: 0.25rem;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        
-        .vendor-type-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        
-        .add-type-button {
-            background-color: #f8f9fa;
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-            padding: 0.125rem 0.375rem;
-            font-size: 0.7rem;
-            cursor: pointer;
-        }
-        
-        .vendor-type-dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #fff;
-            min-width: 120px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-            border-radius: 0.25rem;
-            overflow: hidden;
-        }
-        
-        .type-option {
-            padding: 0.375rem 0.75rem;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-        
-        .type-option:hover {
-            background-color: #f8f9fa;
-        }
-        
-        /* Filter controls */
-        .filter-controls {
-            background-color: #fff;
-            padding: 0.75rem;
-            border-radius: 0.375rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            margin-bottom: 1rem;
-        }
-        
-        .filter-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .filter-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .filter-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-bottom: 0;
-            white-space: nowrap;
-        }
-        
-        .filter-select, .filter-input {
-            font-size: 0.8rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            border: 1px solid #ced4da;
-        }
-        
-        .results-count {
-            font-size: 0.75rem;
-            color: #6c757d;
-            margin-bottom: 0;
-        }
-    </style>
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">Vendor Management</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/vendor-management">Vendor Management</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/vendorlist">Vendor List</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/purposeslist">Purposes List</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    
-    <div class="container-fluid">
-        <!-- Filter Controls -->
-        <div class="filter-controls">
-            <div class="filter-row">
-                <div class="filter-group">
-                    <label for="searchInput" class="filter-label">Search:</label>
-                    <input type="text" id="searchInput" class="filter-input" placeholder="Search vendors..." onkeyup="filterTable()">
-                </div>
-                <div class="filter-group">
-                    <label for="statusFilter" class="filter-label">Status:</label>
-                    <select id="statusFilter" class="filter-select" onchange="filterTable()">
-                        <option value="all">All</option>
-                        <option value="none">None</option>
-                        <option value="Partner">Partner</option>
-                        <option value="Shortlist">Shortlist</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="typeFilter" class="filter-label">Vendor Type:</label>
-                    <select id="typeFilter" class="filter-select" onchange="filterTable()">
-                        <option value="all">All</option>
-                        <option value="none">None</option>
-                        <option value="ssp">SSP</option>
-                        <option value="dsp">DSP</option>
-                        <option value="ads">Ads</option>
-                        <option value="networks">Networks</option>
-                        <option value="measurement">Measurement</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="mblFilter" class="filter-label">MBL Audited:</label>
-                    <select id="mblFilter" class="filter-select" onchange="filterTable()">
-                        <option value="all">All</option>
-                        <option value="Yes">Yes</option>
-                        <option value="No/Unknown">No/Unknown</option>
-                    </select>
-                </div>
-            </div>
-            <div class="filter-row">
-                <p id="resultsCount" class="results-count">Showing {{ vendors|length }} vendors</p>
-            </div>
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> Use this page to manage vendor status, set MBL audited status, and assign vendor types.
         </div>
         
-        <!-- Vendor Table -->
         <div class="table-responsive">
-            <table id="vendorTable" class="table table-striped table-bordered">
+            <table class="table table-striped table-hover">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Vendor</th>
+                        <th>Name</th>
                         <th>Status</th>
-                        <th>Vendor Type</th>
                         <th>MBL Audited</th>
+                        <th>Vendor Types</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for vendor in vendors %}
                     <tr>
                         <td>{{ vendor.id }}</td>
-                        <td title="{{ vendor.name }}">{{ vendor.name }}</td>
+                        <td>{{ vendor.name }}</td>
                         <td>
-                            <div class="status-container">
-                                {% if vendor.status %}
-                                <span class="status-tag {% if vendor.status == 'Partner' %}status-partner{% elif vendor.status == 'Shortlist' %}status-shortlist{% else %}status-none{% endif %}" data-status="{{ vendor.status }}">
-                                    {{ vendor.status }}
-                                    <span class="remove-status" onclick="updateVendorStatus('{{ vendor.id }}', '')">&times;</span>
-                                </span>
-                                {% else %}
-                                <div class="status-dropdown">
-                                    <button class="select-status-button" onclick="toggleStatusDropdown('{{ vendor.id }}')">Select Status</button>
-                                    <div id="status-dropdown-{{ vendor.id }}" class="status-dropdown-content">
-                                        <div class="status-option" onclick="updateVendorStatus('{{ vendor.id }}', 'Partner')">Partner</div>
-                                        <div class="status-option" onclick="updateVendorStatus('{{ vendor.id }}', 'Shortlist')">Shortlist</div>
-                                    </div>
-                                </div>
-                                {% endif %}
-                            </div>
+                            <select class="form-select status-select" data-vendor-id="{{ vendor.id }}">
+                                <option value="" {% if vendor.status == '' %}selected{% endif %}>None</option>
+                                <option value="Partner" {% if vendor.status == 'Partner' %}selected{% endif %}>Partner</option>
+                                <option value="Shortlist" {% if vendor.status == 'Shortlist' %}selected{% endif %}>Shortlist</option>
+                            </select>
                         </td>
                         <td>
-                            <div id="vendor-type-container-{{ vendor.id }}" class="vendor-type-container">
+                            <select class="form-select mbl-select" data-vendor-id="{{ vendor.id }}">
+                                <option value="No/Unknown" {% if vendor.mblAudited == 'No/Unknown' %}selected{% endif %}>No/Unknown</option>
+                                <option value="Yes" {% if vendor.mblAudited == 'Yes' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </td>
+                        <td>
+                            <div class="vendor-types-container" data-vendor-id="{{ vendor.id }}">
                                 {% if vendor.vendorTypes %}
                                     {% for type in vendor.vendorTypes %}
-                                    <span class="vendor-type-tag" data-type="{{ type }}">
-                                        {% if type == 'ssp' %}SSP
-                                        {% elif type == 'dsp' %}DSP
-                                        {% elif type == 'ads' %}Ads
-                                        {% elif type == 'networks' %}Net
-                                        {% elif type == 'measurement' %}Meas
-                                        {% elif type == 'other' %}Other
-                                        {% else %}{{ type }}
-                                        {% endif %}
-                                        <span class="remove-type" onclick="removeVendorType('{{ vendor.id }}', '{{ type }}', event)">&times;</span>
-                                    </span>
+                                        <span class="vendor-type-tag">
+                                            {{ type }}
+                                            <button type="button" class="btn-close btn-close-white remove-type" aria-label="Remove" data-type="{{ type }}"></button>
+                                        </span>
                                     {% endfor %}
                                 {% endif %}
-                            </div>
-                            <div class="vendor-type-dropdown">
-                                <button class="add-type-button" onclick="toggleTypeDropdown('{{ vendor.id }}')">Add Type</button>
-                                <div id="type-dropdown-{{ vendor.id }}" class="vendor-type-dropdown-content">
-                                    <div class="type-option" onclick="addVendorType('{{ vendor.id }}', 'ssp')">SSP</div>
-                                    <div class="type-option" onclick="addVendorType('{{ vendor.id }}', 'dsp')">DSP</div>
-                                    <div class="type-option" onclick="addVendorType('{{ vendor.id }}', 'ads')">Ads</div>
-                                    <div class="type-option" onclick="addVendorType('{{ vendor.id }}', 'networks')">Networks</div>
-                                    <div class="type-option" onclick="addVendorType('{{ vendor.id }}', 'measurement')">Measurement</div>
-                                    <div class="type-option" onclick="addVendorType('{{ vendor.id }}', 'other')">Other</div>
-                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-secondary add-type-btn">
+                                    <i class="bi bi-plus"></i> Add
+                                </button>
                             </div>
                         </td>
                         <td>
-                            <div class="mbl-container">
-                                {% if vendor.mblAudited == 'Yes' %}
-                                <span class="mbl-tag mbl-yes" data-mbl="Yes">
-                                    Yes
-                                    <span class="remove-mbl" onclick="updateVendorMBL('{{ vendor.id }}', 'No/Unknown')">&times;</span>
-                                </span>
-                                {% else %}
-                                <div class="mbl-dropdown">
-                                    <button class="select-mbl-button mbl-no" onclick="toggleMBLDropdown('{{ vendor.id }}')">No/Unknown</button>
-                                    <div id="mbl-dropdown-{{ vendor.id }}" class="mbl-dropdown-content">
-                                        <div class="mbl-option" onclick="updateVendorMBL('{{ vendor.id }}', 'Yes')">Yes</div>
-                                    </div>
-                                </div>
-                                {% endif %}
-                            </div>
+                            <a href="{{ url_for('inspect_vendor', vendor_id=vendor.id) }}" class="btn btn-sm btn-info">
+                                <i class="bi bi-eye"></i> View
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+        
+        <!-- Add Type Modal -->
+        <div class="modal fade" id="addTypeModal" tabindex="-1" aria-labelledby="addTypeModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addTypeModalLabel">Add Vendor Type</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="vendorIdForType" value="">
+                        <div class="mb-3">
+                            <label for="vendorType" class="form-label">Vendor Type</label>
+                            <select class="form-select" id="vendorType">
+                                <option value="" disabled selected>Select a vendor type</option>
+                                <option value="Advertiser">Advertiser</option>
+                                <option value="Agency">Agency</option>
+                                <option value="DSP">DSP</option>
+                                <option value="SSP">SSP</option>
+                                <option value="Ad Network">Ad Network</option>
+                                <option value="Data Provider">Data Provider</option>
+                                <option value="DMP">DMP</option>
+                                <option value="Analytics Provider">Analytics Provider</option>
+                                <option value="Verification Provider">Verification Provider</option>
+                                <option value="Consent Management Platform">Consent Management Platform</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 d-none" id="customTypeContainer">
+                            <label for="customType" class="form-label">Custom Type</label>
+                            <input type="text" class="form-control" id="customType" placeholder="Enter custom vendor type">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="saveTypeBtn">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Password Modal for Updates -->
+        <div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="passwordModalLabel">Enter Password</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="updatePassword" class="form-label">Password for updates</label>
+                            <input type="password" class="form-control" id="updatePassword">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="confirmUpdateBtn">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    
+{% endblock %}
+
+{% block extra_js %}
     <script>
-        // Function to toggle the status dropdown
-        function toggleStatusDropdown(vendorId) {
-            var dropdown = document.getElementById("status-dropdown-" + vendorId);
-            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+        // Store the update data
+        let updateData = null;
+        let updateCallback = null;
+        
+        // Predefined vendor types
+        const predefinedTypes = [
+            'Advertiser', 'Agency', 'DSP', 'SSP', 'Ad Network', 
+            'Data Provider', 'DMP', 'Analytics Provider', 
+            'Verification Provider', 'Consent Management Platform', 'Other'
+        ];
+        
+        // Function to show the password modal if needed
+        function showPasswordModal(data, callback) {
+            updateData = data;
+            updateCallback = callback;
             
-            // Close all other dropdowns
-            var allDropdowns = document.getElementsByClassName("status-dropdown-content");
-            for (var i = 0; i < allDropdowns.length; i++) {
-                if (allDropdowns[i].id !== "status-dropdown-" + vendorId) {
-                    allDropdowns[i].style.display = "none";
-                }
-            }
-            
-            // Close all type dropdowns
-            var typeDropdowns = document.getElementsByClassName("vendor-type-dropdown-content");
-            for (var i = 0; i < typeDropdowns.length; i++) {
-                typeDropdowns[i].style.display = "none";
-            }
-            
-            // Close all MBL dropdowns
-            var mblDropdowns = document.getElementsByClassName("mbl-dropdown-content");
-            for (var i = 0; i < mblDropdowns.length; i++) {
-                mblDropdowns[i].style.display = "none";
-            }
+            {% if update_enabled %}
+                // If updates are enabled without password, just perform the update
+                performUpdate(data);
+            {% else %}
+                // Show the password modal
+                const passwordModal = new bootstrap.Modal(document.getElementById('passwordModal'));
+                passwordModal.show();
+            {% endif %}
         }
         
-        // Function to toggle the MBL dropdown
-        function toggleMBLDropdown(vendorId) {
-            var dropdown = document.getElementById("mbl-dropdown-" + vendorId);
-            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
-            
-            // Close all other dropdowns
-            var allDropdowns = document.getElementsByClassName("mbl-dropdown-content");
-            for (var i = 0; i < allDropdowns.length; i++) {
-                if (allDropdowns[i].id !== "mbl-dropdown-" + vendorId) {
-                    allDropdowns[i].style.display = "none";
-                }
+        // Function to perform the actual update
+        function performUpdate(data) {
+            // Add the password if we're using the password modal
+            if (document.getElementById('updatePassword').value) {
+                data.password = document.getElementById('updatePassword').value;
             }
             
-            // Close all status dropdowns
-            var statusDropdowns = document.getElementsByClassName("status-dropdown-content");
-            for (var i = 0; i < statusDropdowns.length; i++) {
-                statusDropdowns[i].style.display = "none";
-            }
-            
-            // Close all type dropdowns
-            var typeDropdowns = document.getElementsByClassName("vendor-type-dropdown-content");
-            for (var i = 0; i < typeDropdowns.length; i++) {
-                typeDropdowns[i].style.display = "none";
-            }
-        }
-        
-        // Function to update vendor status
-        function updateVendorStatus(vendorId, status) {
-            // Send the update to the server
+            // Make the AJAX request
             fetch('/update_vendor', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    vendorId: vendorId,
-                    field: 'status',
-                    value: status,
-                    password: ''
-                })
+                body: JSON.stringify(data)
             })
             .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update the UI
-                    var container = document.querySelector(`tr td:nth-child(3) .status-container`);
+            .then(result => {
+                if (result.success) {
+                    if (updateCallback) updateCallback();
                     
-                    // Find the container for this specific vendor
-                    var allContainers = document.querySelectorAll('.status-container');
-                    for (var i = 0; i < allContainers.length; i++) {
-                        var row = allContainers[i].closest('tr');
-                        if (row.cells[0].textContent.trim() === vendorId) {
-                            container = allContainers[i];
-                            break;
+                    // Hide the password modal if it's open
+                    const passwordModalElement = document.getElementById('passwordModal');
+                    if (passwordModalElement) {
+                        const passwordModal = bootstrap.Modal.getInstance(passwordModalElement);
+                        if (passwordModal) passwordModal.hide();
+                    }
+                    
+                    // Reset the password field
+                    document.getElementById('updatePassword').value = '';
+                } else {
+                    alert('Error: ' + (result.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error: ' + error);
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle status select change
+            document.querySelectorAll('.status-select').forEach(select => {
+                select.addEventListener('change', function() {
+                    const vendorId = this.getAttribute('data-vendor-id');
+                    const value = this.value;
+                    
+                    showPasswordModal({
+                        vendorId: vendorId,
+                        field: 'status',
+                        value: value
+                    });
+                });
+            });
+            
+            // Handle MBL audited select change
+            document.querySelectorAll('.mbl-select').forEach(select => {
+                select.addEventListener('change', function() {
+                    const vendorId = this.getAttribute('data-vendor-id');
+                    const value = this.value;
+                    
+                    showPasswordModal({
+                        vendorId: vendorId,
+                        field: 'mblAudited',
+                        value: value
+                    });
+                });
+            });
+            
+            // Set up add type button
+            document.querySelectorAll('.add-type-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const container = this.closest('.vendor-types-container');
+                    const vendorId = container.getAttribute('data-vendor-id');
+                    document.getElementById('vendorIdForType').value = vendorId;
+                    
+                    // Reset the select dropdown
+                    const typeSelect = document.getElementById('vendorType');
+                    typeSelect.selectedIndex = 0;
+                    
+                    // Hide custom type field initially
+                    document.getElementById('customTypeContainer').classList.add('d-none');
+                    document.getElementById('customType').value = '';
+                    
+                    // Get current vendor types to disable already selected options
+                    const typeTags = container.querySelectorAll('.vendor-type-tag');
+                    const currentTypes = [];
+                    typeTags.forEach(tag => {
+                        currentTypes.push(tag.textContent.trim().replace('×', '').trim());
+                    });
+                    
+                    // Disable already selected options
+                    Array.from(typeSelect.options).forEach(option => {
+                        if (currentTypes.includes(option.value)) {
+                            option.disabled = true;
+                        } else {
+                            option.disabled = option.value === "" ? true : false; // Keep first option disabled
                         }
-                    }
+                    });
                     
-                    if (status) {
-                        // Create status tag
-                        var statusClass = status === 'Partner' ? 'status-partner' : 'status-shortlist';
-                        container.innerHTML = `
-                            <span class="status-tag ${statusClass}" data-status="${status}">
-                                ${status}
-                                <span class="remove-status" onclick="updateVendorStatus('${vendorId}', '')">&times;</span>
-                            </span>
-                        `;
-                    } else {
-                        // Create status dropdown
-                        container.innerHTML = `
-                            <div class="status-dropdown">
-                                <button class="select-status-button" onclick="toggleStatusDropdown('${vendorId}')">Select Status</button>
-                                <div id="status-dropdown-${vendorId}" class="status-dropdown-content">
-                                    <div class="status-option" onclick="updateVendorStatus('${vendorId}', 'Partner')">Partner</div>
-                                    <div class="status-option" onclick="updateVendorStatus('${vendorId}', 'Shortlist')">Shortlist</div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                    
-                    // Refresh the filter
-                    filterTable();
-                } else {
-                    console.error('Error updating vendor status:', data.error);
-                    alert('Error updating vendor status: ' + data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error updating vendor status:', error);
+                    const addTypeModal = new bootstrap.Modal(document.getElementById('addTypeModal'));
+                    addTypeModal.show();
+                });
             });
-        }
-        
-        // Function to update vendor MBL audited status
-        function updateVendorMBL(vendorId, mblStatus) {
-            // Send the update to the server
-            fetch('/update_vendor', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    vendorId: vendorId,
-                    field: 'mblAudited',
-                    value: mblStatus,
-                    password: ''
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update the UI
-                    var container = document.querySelector(`tr td:nth-child(5) .mbl-container`);
+            
+            // Handle Other option in vendor type dropdown
+            document.getElementById('vendorType').addEventListener('change', function() {
+                const customTypeContainer = document.getElementById('customTypeContainer');
+                if (this.value === 'Other') {
+                    customTypeContainer.classList.remove('d-none');
+                } else {
+                    customTypeContainer.classList.add('d-none');
+                }
+            });
+            
+            // Set up remove type buttons
+            document.querySelectorAll('.remove-type').forEach(button => {
+                button.addEventListener('click', function() {
+                    const type = this.getAttribute('data-type');
+                    const container = this.closest('.vendor-types-container');
+                    const vendorId = container.getAttribute('data-vendor-id');
                     
-                    // Find the container for this specific vendor
-                    var allContainers = document.querySelectorAll('.mbl-container');
-                    for (var i = 0; i < allContainers.length; i++) {
-                        var row = allContainers[i].closest('tr');
-                        if (row.cells[0].textContent.trim() === vendorId) {
-                            container = allContainers[i];
-                            break;
+                    // Get current vendor types
+                    const typeTags = container.querySelectorAll('.vendor-type-tag');
+                    const currentTypes = [];
+                    typeTags.forEach(tag => {
+                        const tagType = tag.textContent.trim().replace('×', '').trim();
+                        if (tagType !== type) {
+                            currentTypes.push(tagType);
                         }
-                    }
+                    });
                     
-                    if (mblStatus === 'Yes') {
-                        // Create MBL Yes tag
-                        container.innerHTML = `
-                            <span class="mbl-tag mbl-yes" data-mbl="Yes">
-                                Yes
-                                <span class="remove-mbl" onclick="updateVendorMBL('${vendorId}', 'No/Unknown')">&times;</span>
-                            </span>
-                        `;
-                    } else {
-                        // Create MBL No/Unknown dropdown
-                        container.innerHTML = `
-                            <div class="mbl-dropdown">
-                                <button class="select-mbl-button mbl-no" onclick="toggleMBLDropdown('${vendorId}')">No/Unknown</button>
-                                <div id="mbl-dropdown-${vendorId}" class="mbl-dropdown-content">
-                                    <div class="mbl-option" onclick="updateVendorMBL('${vendorId}', 'Yes')">Yes</div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                    
-                    // Refresh the filter
-                    filterTable();
-                } else {
-                    console.error('Error updating vendor MBL status:', data.error);
-                    alert('Error updating vendor MBL status: ' + data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error updating vendor MBL status:', error);
+                    showPasswordModal({
+                        vendorId: vendorId,
+                        field: 'vendorTypes',
+                        value: currentTypes
+                    }, function() {
+                        // Remove the tag
+                        button.closest('.vendor-type-tag').remove();
+                    });
+                });
             });
-        }
-        
-        // Function to toggle the vendor type dropdown
-        function toggleTypeDropdown(vendorId) {
-            var dropdown = document.getElementById("type-dropdown-" + vendorId);
-            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
             
-            // Close all other dropdowns
-            var allDropdowns = document.getElementsByClassName("vendor-type-dropdown-content");
-            for (var i = 0; i < allDropdowns.length; i++) {
-                if (allDropdowns[i].id !== "type-dropdown-" + vendorId) {
-                    allDropdowns[i].style.display = "none";
-                }
-            }
-            
-            // Close all status dropdowns
-            var statusDropdowns = document.getElementsByClassName("status-dropdown-content");
-            for (var i = 0; i < statusDropdowns.length; i++) {
-                statusDropdowns[i].style.display = "none";
-            }
-            
-            // Close all MBL dropdowns
-            var mblDropdowns = document.getElementsByClassName("mbl-dropdown-content");
-            for (var i = 0; i < mblDropdowns.length; i++) {
-                mblDropdowns[i].style.display = "none";
-            }
-        }
-        
-        // Function to add vendor type
-        function addVendorType(vendorId, type) {
-            // Get current vendor types
-            var container = document.getElementById("vendor-type-container-" + vendorId);
-            var currentTypes = [];
-            var typeTags = container.querySelectorAll(".vendor-type-tag");
-            
-            for (var i = 0; i < typeTags.length; i++) {
-                currentTypes.push(typeTags[i].getAttribute("data-type"));
-            }
-            
-            // Check if type already exists
-            if (currentTypes.includes(type)) {
-                return; // Type already exists, do nothing
-            }
-            
-            // Add the new type
-            currentTypes.push(type);
-            
-            // Send the update to the server
-            fetch('/update_vendor', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    vendorId: vendorId,
-                    field: 'vendorTypes',
-                    value: currentTypes,
-                    password: ''
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Add the type tag to the UI
-                    var typeLabel = "";
-                    if (type === "ssp") typeLabel = "SSP";
-                    else if (type === "dsp") typeLabel = "DSP";
-                    else if (type === "ads") typeLabel = "Ads";
-                    else if (type === "networks") typeLabel = "Net";
-                    else if (type === "measurement") typeLabel = "Meas";
-                    else if (type === "other") typeLabel = "Other";
-                    else typeLabel = type;
-                    
-                    var typeTag = document.createElement("span");
-                    typeTag.className = "vendor-type-tag";
-                    typeTag.setAttribute("data-type", type);
-                    typeTag.innerHTML = typeLabel + '<span class="remove-type" onclick="removeVendorType(\'' + vendorId + '\', \'' + type + '\', event)">&times;</span>';
-                    
-                    container.appendChild(typeTag);
-                    
-                    // Close the dropdown
-                    var dropdown = document.getElementById("type-dropdown-" + vendorId);
-                    dropdown.style.display = "none";
-                    
-                    // Refresh the filter
-                    filterTable();
-                } else {
-                    console.error('Error adding vendor type:', data.error);
-                    alert('Error adding vendor type: ' + data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error adding vendor type:', error);
-            });
-        }
-        
-        // Function to remove vendor type
-        function removeVendorType(vendorId, type, event) {
-            event.stopPropagation();
-            
-            // Get current vendor types
-            var container = document.getElementById("vendor-type-container-" + vendorId);
-            var currentTypes = [];
-            var typeTags = container.querySelectorAll(".vendor-type-tag");
-            
-            for (var i = 0; i < typeTags.length; i++) {
-                var tagType = typeTags[i].getAttribute("data-type");
-                if (tagType !== type) {
-                    currentTypes.push(tagType);
-                }
-            }
-            
-            // Send the update to the server
-            fetch('/update_vendor', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    vendorId: vendorId,
-                    field: 'vendorTypes',
-                    value: currentTypes,
-                    password: ''
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Remove the type tag from the UI
-                    var tagToRemove = event.target.parentElement;
-                    container.removeChild(tagToRemove);
-                } else {
-                    console.error('Error removing vendor type:', data.error);
-                    alert('Error removing vendor type: ' + data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error removing vendor type:', error);
-            });
-        }
-        
-        // Function to filter the table
-        function filterTable() {
-            var searchInput = document.getElementById("searchInput");
-            var searchFilter = searchInput.value.toUpperCase();
-            var statusFilter = document.getElementById("statusFilter").value;
-            var typeFilter = document.getElementById("typeFilter").value;
-            var mblFilter = document.getElementById("mblFilter").value;
-            
-            var table = document.getElementById("vendorTable");
-            var tr = table.getElementsByTagName("tr");
-            var visibleCount = 0;
-            
-            // Loop through all table rows, and hide those who don't match the search query
-            for (var i = 1; i < tr.length; i++) { // Start from 1 to skip header row
-                var nameCell = tr[i].getElementsByTagName("td")[1];
-                var statusCell = tr[i].getElementsByTagName("td")[2];
-                var typeCell = tr[i].getElementsByTagName("td")[3];
-                var mblCell = tr[i].getElementsByTagName("td")[4];
+            // Set up save type button
+            document.getElementById('saveTypeBtn').addEventListener('click', function() {
+                const vendorId = document.getElementById('vendorIdForType').value;
+                const typeSelect = document.getElementById('vendorType');
+                let type = typeSelect.value;
                 
-                if (nameCell && statusCell && typeCell && mblCell) {
-                    var nameValue = nameCell.textContent || nameCell.innerText;
-                    var statusTag = statusCell.querySelector(".status-tag");
-                    var statusValue = statusTag ? statusTag.getAttribute("data-status") : "";
-                    var typeTags = typeCell.getElementsByClassName("vendor-type-tag");
-                    var typeValues = [];
-                    
-                    for (var j = 0; j < typeTags.length; j++) {
-                        typeValues.push(typeTags[j].getAttribute("data-type"));
-                    }
-                    
-                    var mblTag = mblCell.querySelector(".mbl-tag");
-                    var mblValue = mblTag ? mblTag.getAttribute("data-mbl") : "";
-                    
-                    var matchesSearch = nameValue.toUpperCase().indexOf(searchFilter) > -1;
-                    var matchesStatus = statusFilter === 'all' || 
-                                       (statusFilter === 'none' && statusValue === '') || 
-                                       statusValue === statusFilter;
-                    var matchesType = typeFilter === 'all' || 
-                                     (typeFilter === 'none' && typeValues.length === 0) || 
-                                     typeValues.includes(typeFilter);
-                    var matchesMBL = mblFilter === 'all' || 
-                                     (mblFilter === 'none' && mblValue === '') || 
-                                     mblValue === mblFilter;
-                    
-                    if (matchesSearch && matchesStatus && matchesType && matchesMBL) {
-                        tr[i].style.display = "";
-                        visibleCount++;
-                    } else {
-                        tr[i].style.display = "none";
-                    }
+                // If "Other" is selected, use the custom type value
+                if (type === 'Other') {
+                    type = document.getElementById('customType').value.trim();
                 }
-            }
+                
+                if (!type) {
+                    alert('Please select or enter a vendor type');
+                    return;
+                }
+                
+                // Get the container
+                const container = document.querySelector(`.vendor-types-container[data-vendor-id="${vendorId}"]`);
+                
+                // Get current vendor types
+                const typeTags = container.querySelectorAll('.vendor-type-tag');
+                const currentTypes = [];
+                typeTags.forEach(tag => {
+                    currentTypes.push(tag.textContent.trim().replace('×', '').trim());
+                });
+                
+                // Don't add duplicates
+                if (currentTypes.includes(type)) {
+                    alert('This vendor type already exists');
+                    return;
+                }
+                
+                // Add the new type
+                currentTypes.push(type);
+                
+                showPasswordModal({
+                    vendorId: vendorId,
+                    field: 'vendorTypes',
+                    value: currentTypes
+                }, function() {
+                    // Add the new tag to the UI
+                    const addButton = container.querySelector('.add-type-btn');
+                    const newTag = document.createElement('span');
+                    newTag.className = 'vendor-type-tag';
+                    newTag.innerHTML = `
+                        ${type}
+                        <button type="button" class="btn-close btn-close-white remove-type" aria-label="Remove" data-type="${type}"></button>
+                    `;
+                    container.insertBefore(newTag, addButton);
+                    
+                    // Add event listener to the new remove button
+                    const removeButton = newTag.querySelector('.remove-type');
+                    removeButton.addEventListener('click', function() {
+                        const typeToRemove = this.getAttribute('data-type');
+                        const vendorIdToUpdate = container.getAttribute('data-vendor-id');
+                        
+                        // Get current vendor types
+                        const currentTypeTags = container.querySelectorAll('.vendor-type-tag');
+                        const updatedTypes = [];
+                        currentTypeTags.forEach(tag => {
+                            const tagType = tag.textContent.trim().replace('×', '').trim();
+                            if (tagType !== typeToRemove) {
+                                updatedTypes.push(tagType);
+                            }
+                        });
+                        
+                        showPasswordModal({
+                            vendorId: vendorIdToUpdate,
+                            field: 'vendorTypes',
+                            value: updatedTypes
+                        }, function() {
+                            // Remove the tag
+                            removeButton.closest('.vendor-type-tag').remove();
+                        });
+                    });
+                    
+                    // Hide the modal
+                    const addTypeModal = bootstrap.Modal.getInstance(document.getElementById('addTypeModal'));
+                    addTypeModal.hide();
+                });
+            });
             
-            // Update the results count
-            document.getElementById("resultsCount").textContent = "Showing " + visibleCount + " of " + (tr.length - 1) + " vendors";
-        }
+            // Set up confirm update button in password modal
+            document.getElementById('confirmUpdateBtn').addEventListener('click', function() {
+                performUpdate(updateData);
+            });
+        });
     </script>
-</body>
-</html> 
+{% endblock %} 

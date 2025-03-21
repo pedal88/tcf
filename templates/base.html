@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TCF Vendor Manager{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Select2 CSS (for searchable dropdowns) -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    
+    <!-- Additional CSS -->
+    <style>
+        body {
+            padding-top: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            background-color: #343a40;
+            margin-bottom: 20px;
+        }
+        
+        /* Custom table styles for softer appearance */
+        .table {
+            border-color: #e9ecef;
+            color: #495057;
+        }
+        
+        .table-striped > tbody > tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        
+        .table-hover > tbody > tr:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+        }
+        
+        .table th {
+            font-weight: 500;
+            border-top: none;
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+        
+        .table td {
+            font-weight: 400;
+            vertical-align: middle;
+        }
+        
+        /* Softer badges */
+        .badge {
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            padding: 0.35em 0.65em;
+        }
+        
+        .bg-primary {
+            background-color: rgba(13, 110, 253, 0.15) !important;
+            color: #0d6efd !important;
+            border: 1px solid rgba(13, 110, 253, 0.2);
+        }
+        
+        .bg-info {
+            background-color: rgba(13, 202, 240, 0.15) !important;
+            color: #0dcaf0 !important;
+            border: 1px solid rgba(13, 202, 240, 0.2);
+        }
+        
+        .bg-success {
+            background-color: rgba(25, 135, 84, 0.15) !important;
+            color: #198754 !important;
+            border: 1px solid rgba(25, 135, 84, 0.2);
+        }
+        
+        .bg-warning {
+            background-color: rgba(255, 193, 7, 0.15) !important;
+            color: #664d03 !important;
+            border: 1px solid rgba(255, 193, 7, 0.2);
+        }
+        
+        .bg-secondary {
+            background-color: rgba(108, 117, 125, 0.15) !important;
+            color: #6c757d !important;
+            border: 1px solid rgba(108, 117, 125, 0.2);
+        }
+        
+        /* Table responsive container with subtle shadow */
+        .table-responsive {
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .purpose-section {
+            margin-bottom: 2rem;
+        }
+        
+        .purpose-item {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: white;
+        }
+        
+        .purpose-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .purpose-id {
+            background-color: #007bff;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-right: 8px;
+            font-size: 0.9em;
+        }
+        
+        .purpose-description {
+            margin-bottom: 8px;
+            color: #555;
+        }
+        
+        .purpose-legal-basis {
+            font-size: 0.9em;
+            font-style: italic;
+        }
+        
+        .consent-or-li {
+            color: #dc3545;
+        }
+        
+        .li-only {
+            color: #fd7e14;
+        }
+        
+        .consent-only {
+            color: #6f42c1;
+        }
+        
+        .search-container {
+            background-color: white;
+            border-radius: 8px;
+            padding:
+            20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .search-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #343a40;
+        }
+        
+        .vendor-select-container {
+            margin-bottom: 15px;
+        }
+        
+        .vendor-select-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .select2-container {
+            width: 100% !important;
+        }
+        
+        .compare-row {
+            margin-top: 30px;
+        }
+        
+        .vendor-column .card {
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            margin: 15px 0 10px 0;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+            color: #343a40;
+        }
+        
+        .info-row {
+            margin-bottom: 8px;
+            display: flex;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            min-width: 180px;
+        }
+        
+        .info-value {
+            flex: 1;
+        }
+        
+        .diff-highlight {
+            background-color: #fff3cd;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        .status-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .status-partner {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: #198754;
+            border: 1px solid rgba(40, 167, 69, 0.2);
+        }
+        
+        .status-shortlist {
+            background-color: rgba(255, 193, 7, 0.15);
+            color: #664d03;
+            border: 1px solid rgba(255, 193, 7, 0.2);
+        }
+        
+        .status-none {
+            background-color: rgba(233, 236, 239, 0.5);
+            color: #6c757d;
+            border: 1px solid rgba(233, 236, 239, 0.8);
+        }
+        
+        .mbl-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .mbl-yes {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: #198754;
+            border: 1px solid rgba(40, 167, 69, 0.2);
+        }
+        
+        .mbl-no {
+            background-color: rgba(220, 53, 69, 0.15);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+        
+        .vendor-type-tag {
+            display: inline-block;
+            background-color: rgba(108, 117, 125, 0.15);
+            color: #6c757d;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            font-size: 0.85em;
+            border: 1px solid rgba(108, 117, 125, 0.2);
+        }
+        
+        .vendor-types-container .btn-close {
+            font-size: 0.65em;
+            margin-left: 4px;
+            opacity: 0.5;
+        }
+        
+        .vendor-types-container .btn-close:hover {
+            opacity: 0.8;
+        }
+        
+        .add-type-btn {
+            font-size: 0.8em;
+            padding: 0.25em 0.5em;
+            border-color: rgba(108, 117, 125, 0.2);
+        }
+        
+        .purpose-label {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-right: 5px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .purpose-c-label {
+            background-color: rgba(0, 123, 255, 0.15);
+            color: #007bff;
+            border: 1px solid rgba(0, 123, 255, 0.2);
+        }
+        
+        .purpose-li-label {
+            background-color: rgba(253, 126, 20, 0.15);
+            color: #fd7e14;
+            border: 1px solid rgba(253, 126, 20, 0.2);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{{ url_for('index') }}">TCF Vendor Manager</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('vendorlist') }}">Vendorlist</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('vendor_management') }}">Vendor Management</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('purposeslist') }}">Purposeslist</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('compare_vendors') }}">Compare Vendors</a>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('inspect_vendor') }}">Inspect Vendors</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jQuery (required for Select2) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <!-- Initialize Select2 -->
+    <script>
+        $(document).ready(function() {
+            $('.select2-search').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: $(this).data('placeholder'),
+                allowClear: true
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
